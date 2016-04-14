@@ -509,8 +509,8 @@ static int ComputeThresh(CGT_type *cgt)
     }
 
     qsort(count, hashtest, sizeof(float), compare);
-    LogMessage("#packet: %d | threshold: %1.1f",cgt->count,count[(int)hashtest/2]);
-    
+    LogMessage("#packet: %d | threshold: %1.1f",cgt->count,phi*count[(int)hashtest/2]);
+
     return (int)phi*count[(int)hashtest/2];
 
 }
@@ -557,10 +557,10 @@ static void PreprocFunction(Packet *p,void *context)
     struct tm *oldtm,*newtm;
     oldtm = localtime(&LastLogTime);
     strftime(OldTimeStamp,sizeof(OldTimeStamp),"%d-%m-%y %T", oldtm);
-    
+
     if(TimeInterval >= pc->GatherTime)
     {
-        LastLogTime += GatherTime;
+        LastLogTime += pc->GatherTime;
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
@@ -711,7 +711,7 @@ static void PreprocFunction(Packet *p,void *context)
 
 time_t CompleteLog(time_t a,time_t b)
 {    
-       tSfPolicyId pid = getNapRuntimePolicy();
+    tSfPolicyId pid = getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
 
     TimeInterval=b-a; ///time of sampling in seconds
@@ -721,12 +721,12 @@ time_t CompleteLog(time_t a,time_t b)
     LogMessage("AnomalyDetection : AnomalyDetection is complete Log file.\n");
     while(1)
     {
-        if( TimeInterval >= GatherTime )
+        if( TimeInterval >= pc->GatherTime )
         {
-            a += GatherTime;
+            a += pc->GatherTime;
             tmp = localtime(&a);
             strftime(TimeStamp,sizeof(TimeStamp), "%d-%m-%y,%H:%M:%S,%a", tmp);
-            fprintf(file2,"%s,%d,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00\n",TimeStamp,GatherTime);
+            fprintf(file2,"%s,%d,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00\n",TimeStamp,pc->GatherTime);
             TimeInterval=b-a;
         }
         else
@@ -757,9 +757,9 @@ void SaveToLog(time_t LastLogTime)
     strftime(TimeStamp,sizeof(TimeStamp),"%d-%m-%y,%T,%a", tmp);
     file2=fopen(pc->LogPath,"a");
     fprintf(file2,"%s,%d,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
-        TimeStamp,GatherTime,TcpCountFp,TcpCountFpUp,TcpCountFpDown,LanTcp,UdpCountFp,UdpCountFpUp,UdpCountFpDown,LanUdp,IcmpCountFp,IcmpCountFpUp,IcmpCountFpDown,
-        LanIcmp,SYNACKpNumber,TcpWwwCountUp,TcpWwwCountDown,UdpDnsCountUp,UdpDnsCountDown,ArpRequest,ArpReply,OtherCount,Overall,DataTcpUpKB/GatherTime,DataTcpDownKB/GatherTime,
-        DataWwwUpKB/GatherTime,DataWwwDownKB/GatherTime,DataUdpUpKB/GatherTime,DataUdpDownKB/GatherTime,DataDnsUpKB/GatherTime,DataDnsDownKB/GatherTime);
+        TimeStamp,pc->GatherTime,TcpCountFp,TcpCountFpUp,TcpCountFpDown,LanTcp,UdpCountFp,UdpCountFpUp,UdpCountFpDown,LanUdp,IcmpCountFp,IcmpCountFpUp,IcmpCountFpDown,
+        LanIcmp,SYNACKpNumber,TcpWwwCountUp,TcpWwwCountDown,UdpDnsCountUp,UdpDnsCountDown,ArpRequest,ArpReply,OtherCount,Overall,DataTcpUpKB/pc->GatherTime,DataTcpDownKB/pc->GatherTime,
+        DataWwwUpKB/pc->GatherTime,DataWwwDownKB/pc->GatherTime,DataUdpUpKB/pc->GatherTime,DataUdpDownKB/pc->GatherTime,DataDnsUpKB/pc->GatherTime,DataDnsDownKB/pc->GatherTime);
     fclose(file2);
 }
 
@@ -814,7 +814,7 @@ static void ReadLog(void)
 
 void ReadProfile(void)
 {
-       tSfPolicyId pid = getNapRuntimePolicy();
+    tSfPolicyId pid = getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
 
     char seps[]=",";
@@ -829,7 +829,7 @@ void ReadProfile(void)
         time_t Time,LogTime;
         time(&Time);
         system = localtime(&Time);
-        Time-=GatherTime;
+        Time-=pc->GatherTime;
         LogMessage("AnomalyDetection: Profile opened.\n");
         while(1)
         {
@@ -852,7 +852,7 @@ void ReadProfile(void)
                 LogTime = mktime(&log);
                     if (LogTime != -1)
                     {
-                        if(Time<=LogTime && Time>=LogTime-GatherTime)
+                        if(Time<=LogTime && Time>=LogTime-pc->GatherTime)
                         {
                             token=strtok(string,seps);
                             int i;
@@ -950,8 +950,11 @@ void ReadProfile(void)
 
 static void PreprocCleanExitFunction(int signal, void *data)
 {
-    LastLogTime += GatherTime;
-    if(nlog)
+    tSfPolicyId pid = getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
+
+    LastLogTime += pc->GatherTime;
+    if(pc->nlog)
     {
         SaveToLog(LastLogTime);
         time(&CurrentTime);
@@ -977,7 +980,7 @@ static void PrintConf_AD (const AnomalydetectionConfig* pac)
         LogMessage("\t\tALERT: enable\n");
     else
         LogMessage("\t\tALERT: disable\n");
-    LogMessage("\t\tGATHER TIME: %d\n",pac->GatherTime);
+    LogMessage("\t\tGATHER TIME: %1.3f\n",pac->GatherTime);
 
 }
 
@@ -1028,8 +1031,11 @@ static void Preproc_FreeSet (tSfPolicyUserContextId set)
 
 static void AD_CleanExit(int signal, void* foo)
 {
-    LastLogTime += GatherTime;
-    if(nlog)
+    tSfPolicyId pid = getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
+
+    LastLogTime += pc->GatherTime;
+    if(pc->nlog)
     {
         SaveToLog(LastLogTime);
         time(&CurrentTime);
