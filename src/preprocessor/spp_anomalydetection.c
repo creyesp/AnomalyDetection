@@ -203,8 +203,8 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
 
     /* Process argument list */
     ParseAnomalyDetectionArgs(pPolicyConfig, args);
-    cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
-    vgt = VGT_Init(pc->groups,pc->hashtest,pc->lgn);
+    cgt = CGT_Init(pPolicyConfig->groups,pPolicyConfig->hashtest,pPolicyConfig->lgn);
+    vgt = VGT_Init(pPolicyConfig->groups,pPolicyConfig->hashtest,pPolicyConfig->lgn);
 
 
 
@@ -286,17 +286,17 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
         
         if (!strcasecmp(tokens[i], "phi")) 
         {
-           pc->phi = atof(tokens[++i], &pcEnd, 10);
+           pc->phi = atof(tokens[++i]);
         }
         if (!strcasecmp(tokens[i], "epsilon")) 
         {
-           pc->epsilon = atof(tokens[++i], &pcEnd, 10);
+           pc->epsilon = atof(tokens[++i]);
            pc->groups = (int) ((2/pc->epsilon)+1);
         }
         if (!strcasecmp(tokens[i], "delta")) 
         {
-           pc->delta = atof(tokens[++i], &pcEnd, 10);
-           pc->numberhash = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
+           pc->delta = atof(tokens[++i]);
+           pc->hashtest = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
         }
         if (!strcasecmp(tokens[i], "lgn")) 
         {
@@ -319,7 +319,7 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
         sprintf(pc->ProfilePath, "/usr/local/etc/snort/profile.txt");
      //    strcpy(pc->ProfilePath,aux);
         // LogMessage("----------AD-Parse: antes de asignar ProfilePath\n");
-    if(pc->groups == 0 | pc->numberhash == 0)
+    if(pc->groups == 0 | pc->hashtest == 0)
         ParseError("Invalid preprocessor phi, epsilon or delta option");
     }
     PrintConf_AD(pc);
@@ -508,7 +508,7 @@ static int ComputeThresh(CGT_type *cgt)
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
 
     int ihash, jgroup;
-    float count[hashtest];
+    float count[pc->hashtest];
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
@@ -521,7 +521,7 @@ static int ComputeThresh(CGT_type *cgt)
     qsort(count, pc->hashtest, sizeof(float), compare);
     LogMessage("#packet: %d | threshold: %1.1f",cgt->count,pc->phi*count[(int)pc->hashtest/2]);
 
-    return (int)phi*count[(int)hashtest/2];
+    return (int)pc->phi*count[(int)hashtest/2];
 
 }
 /* Function: PreprocFunction(Packet *)
@@ -991,7 +991,7 @@ static void PrintConf_AD (const AnomalydetectionConfig* pac)
     LogMessage("\t\tepsilon: %f\n",pac->epsilon);
     LogMessage("\t\tdelta: %f\n",pac->delta);
     LogMessage("\t\tgroups: %d\n",pac->groups);
-    LogMessage("\t\tnumberhash: %d\n",pac->numberhash);
+    LogMessage("\t\thashtest: %d\n",pac->hashtest);
 
 }
 

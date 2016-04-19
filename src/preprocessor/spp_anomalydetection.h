@@ -83,7 +83,7 @@ typedef struct _AnomalydetectionConfig
     float delta; //probabilidad de falla
     int lgn;  //largo de los bit a considerar de IP, deberia ser 32 version completa en IP
     int groups;   //numero de grupso totales 
-    int numberhash; //numero de test hash que se realizan.
+    int hashtest; //numero de test hash que se realizan. 
 
 } AnomalydetectionConfig;
 
