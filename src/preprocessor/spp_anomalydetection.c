@@ -521,7 +521,7 @@ static int ComputeThresh(CGT_type *cgt)
     qsort(count, pc->hashtest, sizeof(float), compare);
     LogMessage("#packet: %d | threshold: %1.1f",cgt->count,pc->phi*count[(int)pc->hashtest/2]);
 
-    return (int)pc->phi*count[(int)hashtest/2];
+    return (int)pc->phi*count[(int)pc->hashtest/2];
 
 }
 /* Function: PreprocFunction(Packet *)
