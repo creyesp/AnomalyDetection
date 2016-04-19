@@ -78,6 +78,13 @@ typedef struct _AnomalydetectionConfig
     int nlog;
     int alert;
     int GatherTime;
+    float phi;  //porcentaje de las diferencias totales en la ventana de tiempo
+    float epsilon; //actor de aproximacion 
+    float delta; //probabilidad de falla
+    int lgn;  //largo de los bit a considerar de IP, deberia ser 32 version completa en IP
+    int groups;   //numero de grupso totales 
+    int numberhash; //numero de test hash que se realizan.
+
 } AnomalydetectionConfig;
 
 void SetupAnomalyDetection();

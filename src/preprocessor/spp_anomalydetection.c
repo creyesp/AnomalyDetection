@@ -32,13 +32,13 @@
 CGT_type *cgt, *cgt_old;
 VGT_type *vgt;
 /* variables que de deben ingresar desde el archivo de configiracion*/
-int range; 
-float phi = 0.001; //porcentaje de las diferencias totales en la ventana de tiempo
-float epsilon =  0.0008; //factor de aproximacion 
-float delta = 0.063; //probabilidad de falla
-int gran = 1; //granularidad, cantidad de bit que se toman para hacer la cuenta.
-int lgn = 20; //largo de los bit a considerar de IP, deberia ser 32 version completa en IP
-int thesh;
+// int range; 
+// float phi = 0.001; //porcentaje de las diferencias totales en la ventana de tiempo
+// float epsilon =  0.0008; //factor de aproximacion 
+// float delta = 0.063; //probabilidad de falla
+// int gran = 1; //granularidad, cantidad de bit que se toman para hacer la cuenta.
+// int lgn = 20; //largo de los bit a considerar de IP, deberia ser 32 version completa en IP
+// int thesh;
 
 
 uint64_t TcpCount=0;
@@ -155,10 +155,6 @@ void SetupAnomalyDetection(void)
 static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
 {
     /*********************************************************************/
-    /*calculo que se debe realizar en init*/
-    int groups = (int) ((2/epsilon)+1);
-    int hashtest = (int) ((log10((double) 1/delta)/log10(2))+1);
-    /***********************************************************************/
     LogMessage("----------AD-Init: AnomalyDetectionInit started.\n");
     // tSfPolicyId policy_id = getParserPolicy(NULL);
     int policy_id = (int) getParserPolicy(sc);
@@ -207,9 +203,8 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
 
     /* Process argument list */
     ParseAnomalyDetectionArgs(pPolicyConfig, args);
-    LogMessage("#groups: %d #hashtest: %d\n",groups, hashtest);
-    cgt = CGT_Init(groups,hashtest,lgn);
-    vgt = VGT_Init(groups,hashtest,lgn);
+    cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
+    vgt = VGT_Init(pc->groups,pc->hashtest,pc->lgn);
 
 
 
@@ -282,12 +277,30 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
         {
             // sprintf(FullFileName, "%s", tokens[++i]); 
             sprintf(pc->ProfilePath, "%s", tokens[++i]);
-
         }
 
         if (!strcasecmp(tokens[i], "LogPath")) 
         {
            positionPath=++i;
+        }
+        
+        if (!strcasecmp(tokens[i], "phi")) 
+        {
+           pc->phi = atof(tokens[++i], &pcEnd, 10);
+        }
+        if (!strcasecmp(tokens[i], "epsilon")) 
+        {
+           pc->epsilon = atof(tokens[++i], &pcEnd, 10);
+           pc->groups = (int) ((2/pc->epsilon)+1);
+        }
+        if (!strcasecmp(tokens[i], "delta")) 
+        {
+           pc->delta = atof(tokens[++i], &pcEnd, 10);
+           pc->numberhash = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
+        }
+        if (!strcasecmp(tokens[i], "lgn")) 
+        {
+           pc->lgn = strtol(tokens[++i], &pcEnd, 10);
         }
 
         LogMessage("----------AD-Parse: FIN DEL FOR.......\n");
@@ -306,6 +319,8 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
         sprintf(pc->ProfilePath, "/usr/local/etc/snort/profile.txt");
      //    strcpy(pc->ProfilePath,aux);
         // LogMessage("----------AD-Parse: antes de asignar ProfilePath\n");
+    if(pc->groups == 0 | pc->numberhash == 0)
+        ParseError("Invalid preprocessor phi, epsilon or delta option");
     }
     PrintConf_AD(pc);
 
@@ -489,27 +504,22 @@ int compare (const void * a, const void * b)
 
 static int ComputeThresh(CGT_type *cgt)
 {
-    //hashtest
-    //groups
-    /*********************************************************************/
-    /*calculo que se debe realizar en init*/
-    int groups = (int) ((2/epsilon)+1);
-    int hashtest = (int) ((log10((double) 1/delta)/log10(2))+1);
-    /***********************************************************************/
+    tSfPolicyId pid = getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(anomalydetection_config, pid);
 
     int ihash, jgroup;
     float count[hashtest];
-    for(ihash = 0; ihash < hashtest; ihash++)
+    for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
-        for(jgroup = 0; jgroup < groups; jgroup++)
+        for(jgroup = 0; jgroup < pc->groups; jgroup++)
         {
-            count[ihash] += cgt->counts[ihash*hashtest+jgroup][0];
+            count[ihash] += cgt->counts[ihash*pc->hashtest+jgroup][0];
         }
     }
 
-    qsort(count, hashtest, sizeof(float), compare);
-    LogMessage("#packet: %d | threshold: %1.1f",cgt->count,phi*count[(int)hashtest/2]);
+    qsort(count, pc->hashtest, sizeof(float), compare);
+    LogMessage("#packet: %d | threshold: %1.1f",cgt->count,pc->phi*count[(int)pc->hashtest/2]);
 
     return (int)phi*count[(int)hashtest/2];
 
@@ -525,11 +535,7 @@ static int ComputeThresh(CGT_type *cgt)
 
 static void PreprocFunction(Packet *p,void *context)
 {   
-    /*********************************************************************/
-    /*calculo que se debe realizar en init*/
-    int groups = (int) ((2/epsilon)+1);
-    int hashtest = (int) ((log10((double) 1/delta)/log10(2))+1);
-    /***********************************************************************/
+
 
     //CGT_type *cgt_aux;
     tSfPolicyId pid = getNapRuntimePolicy();
@@ -584,8 +590,8 @@ static void PreprocFunction(Packet *p,void *context)
             //CGT_Destroy(cgt_aux);
             CGT_Destroy(cgt);
             VGT_Destroy(vgt);
-            cgt = CGT_Init(groups,hashtest,lgn);
-            vgt = VGT_Init(groups,hashtest,lgn);
+            cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
+            vgt = VGT_Init(pc->groups,pc->hashtest,pc->lgn);
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
@@ -980,7 +986,12 @@ static void PrintConf_AD (const AnomalydetectionConfig* pac)
         LogMessage("\t\tALERT: enable\n");
     else
         LogMessage("\t\tALERT: disable\n");
-    LogMessage("\t\tGATHER TIME: %1.3f\n",pac->GatherTime);
+    LogMessage("\t\tGATHER TIME: %d\n",pac->GatherTime);
+    LogMessage("\t\tphi: %f\n",pac->phi);
+    LogMessage("\t\tepsilon: %f\n",pac->epsilon);
+    LogMessage("\t\tdelta: %f\n",pac->delta);
+    LogMessage("\t\tgroups: %d\n",pac->groups);
+    LogMessage("\t\tnumberhash: %d\n",pac->numberhash);
 
 }
 
