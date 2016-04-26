@@ -280,6 +280,7 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, int thresh)
       	    {   // For each distinct item in the output...
       	      compresults[claimed++]=results[i];
       	      last=results[i];
+              LogMessage("output %d: %u",i,results[i]);
       	    }
         }      
     }

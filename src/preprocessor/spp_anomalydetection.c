@@ -125,16 +125,12 @@ static void AnomalyDetectionReloadSwapFree(void *);
 
 void SetupAnomalyDetection(void)
 {    
-    // RegisterPreprocessor("AnomalyDetection", AnomalyDetectionInit);
  #ifndef SNORT_RELOAD
      RegisterPreprocessor("AnomalyDetection", AnomalyDetectionInit);
  #else
      RegisterPreprocessor("AnomalyDetection", AnomalyDetectionInit, AnomalyDetectionReload,
                           NULL, AnomalyDetectionReloadSwap,
                           AnomalyDetectionReloadSwapFree);
-     // RegisterPreprocessor("AnomalyDetection", AnomalyDetectionInit, AnomalyDetectionReload,
-     //                      AnomalyDetectionReloadVerify, AnomalyDetectionReloadSwap,
-     //                      AnomalyDetectionReloadSwapFree);
 #endif
     LogMessage("AnomalyDetection : AnomalyDetection is setup\n");
 
@@ -237,45 +233,46 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
  * Purpose: Process the preprocessor arguements from the rules file and
  *          initialize the preprocessor's data struct.
  *
- * Arguments: args => argument list
- *
+ * Arguments: 
+ *      alert:
+ *      log:
+ *      time:
+ *      ProfilePath:
+ *      LogPath:
+ *      phi:
+ *      epsilon:
+ *      delta:
  * Returns: void function
  */
 
 static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
 {
-    LogMessage("----------AD-Parse: Parse Anomaly Detection is loading.\n");
     int positionPath = 0;
     char **tokens=NULL;
     char *pcEnd;
     int toknum=0, i;
-    char aux[100];
     if (args) tokens=mSplit(args," \t",50,&toknum,'\\');
     for (i=0; i<toknum; i++)
     {
-        LogMessage("----------AD-Parse: TOKEN: %s.\n",tokens[i]);
         if (!strcasecmp(tokens[i], "alert")) 
-        {    // alert=1;
+        {    
             pc->alert = 1;
         }
 
         if (!strcasecmp(tokens[i], "log")) 
         {
-            // nlog=1;
             pc->nlog = 1;
         }
 
         if (!strcasecmp(tokens[i], "time")) 
         {
             pc->GatherTime = strtol(tokens[++i], &pcEnd, 10);
-
             if(pc->GatherTime < 1)
                 pc->GatherTime = 1;
         }
 
         if (!strcasecmp(tokens[i], "ProfilePath")) 
         {
-            // sprintf(FullFileName, "%s", tokens[++i]); 
             sprintf(pc->ProfilePath, "%s", tokens[++i]);
         }
 
@@ -288,22 +285,23 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
         {
            pc->phi = atof(tokens[++i]);
         }
+
         if (!strcasecmp(tokens[i], "epsilon")) 
         {
            pc->epsilon = atof(tokens[++i]);
            pc->groups = (int) ((2/pc->epsilon)+1);
         }
+
         if (!strcasecmp(tokens[i], "delta")) 
         {
            pc->delta = atof(tokens[++i]);
            pc->hashtest = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
         }
+
         if (!strcasecmp(tokens[i], "lgn")) 
         {
            pc->lgn = strtol(tokens[++i], &pcEnd, 10);
         }
-
-        LogMessage("----------AD-Parse: FIN DEL FOR.......\n");
     }
 
 
@@ -312,21 +310,12 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
     else
         sprintf(pc->LogPath, "/var/log/snort/ADLog%d.txt", pc->GatherTime);
 
-    LogMessage("----------AD-Parse: antes de ProfilePath\n");
     if(!pc->ProfilePath)
-    {
-        LogMessage("----------AD-Parse: antes de asignar ProfilePath\n");
         sprintf(pc->ProfilePath, "/usr/local/etc/snort/profile.txt");
-     //    strcpy(pc->ProfilePath,aux);
-        // LogMessage("----------AD-Parse: antes de asignar ProfilePath\n");
-    if(pc->groups == 0 | pc->hashtest == 0)
-        ParseError("Invalid preprocessor phi, epsilon or delta option");
-    }
-    PrintConf_AD(pc);
 
-    // if(p==-1)
-        // sprintf(FullPathName, "/var/log/snort/ADLog%d.txt", GatherTime);
-    // else sprintf(FullPathName, "%s/ADLog%d.txt", tokens[p], GatherTime);
+    if(pc->groups == 0 | pc->hashtest == 0)
+            ParseError("Invalid preprocessor phi, epsilon or delta option");
+    PrintConf_AD(pc);
 }
 
 /* Function: CollectData(Packet *)
@@ -519,7 +508,7 @@ static int ComputeThresh(CGT_type *cgt)
     }
 
     qsort(count, pc->hashtest, sizeof(float), compare);
-    LogMessage("#packet: %d | threshold: %1.1f",cgt->count,pc->phi*count[(int)pc->hashtest/2]);
+    LogMessage("#packet: %d | threshold: %d - %1.1f",cgt->count,(int)pc->phi*count[(int)pc->hashtest/2],pc->phi*count[(int)pc->hashtest/2]);
 
     return (int)pc->phi*count[(int)pc->hashtest/2];
 
@@ -702,7 +691,7 @@ static void PreprocFunction(Packet *p,void *context)
     }
     else{
         CollectData(p);
-        CGT(p);
+        CGT(p, cgt, vgt);
     } 
 }
 /* Function: SaveToLog(time_t LastLogTime)
