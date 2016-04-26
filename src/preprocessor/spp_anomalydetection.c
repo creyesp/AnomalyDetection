@@ -691,7 +691,7 @@ static void PreprocFunction(Packet *p,void *context)
     }
     else{
         CollectData(p);
-        CGT(p, cgt, vgt);
+        CGT(p);
     } 
 }
 /* Function: SaveToLog(time_t LastLogTime)
