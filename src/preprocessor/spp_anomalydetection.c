@@ -227,9 +227,10 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
     else
         sprintf(pc->LogPath, "/var/log/snort/ADLog%d.txt", pc->GatherTime);
 
+    PrintConf_AD(pc);
     if(pc->groups == 0 | pc->hashtest == 0)
             ParseError("Invalid preprocessor phi, epsilon or delta option");
-    PrintConf_AD(pc);
+
 }
 
 
