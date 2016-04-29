@@ -29,6 +29,9 @@
 #include "cgt.h"
 #include <math.h>
 
+#define CONF_SEPARATORS         " \t\n\r"
+
+
 CGT_type *cgt, *cgt_old;
 VGT_type *vgt;
 
@@ -180,50 +183,67 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
 static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
 {
     int positionPath = 0;
-    char **tokens=NULL;
+    char * arg;
     char *pcEnd;
-    int toknum=0, i;
-    if (args) tokens=mSplit(args,"\t",50,&toknum,'\\');
-    for (i=0; i<toknum; i++)
+    char path[100];
+
+    if ((args == NULL) || (bo == NULL))
+        return;
+
+    arg = strtok(args, CONF_SEPARATORS);
+
+    while(arg != NULL)
     {
-        if (!strcasecmp(tokens[i], "alert")) 
+        if ( !strcasecmp("alert", arg) ) 
             pc->alert = 1;
 
-        if (!strcasecmp(tokens[i], "log")) 
+        if ( !strcasecmp("log", arg) ) 
             pc->nlog = 1;
 
-        if (!strcasecmp(tokens[i], "time")) 
+        if ( !strcasecmp("time", arg) ) 
         {
-            pc->GatherTime = strtol(tokens[++i], &pcEnd, 10);
+            arg = strtok(NULL, CONF_SEPARATORS);
+            pc->GatherTime = (int) strtol(arg, &pcEnd, 10);
             if(pc->GatherTime < 1)
                 pc->GatherTime = 1;
         }
 
-        if (!strcasecmp(tokens[i], "LogPath")) 
-           positionPath=++i;
+        if ( !strcasecmp("LogPath", arg) ) {
+            arg = strtok(NULL, CONF_SEPARATORS);
+            strcpy(path,arg);
+        }
         
-        if (!strcasecmp(tokens[i], "phi")) 
-           pc->phi = atof(tokens[++i]);
+        if ( !strcasecmp("phi", arg) ) {
+            arg = strtok(NULL, CONF_SEPARATORS);
+            pc->phi = atof(arg);
+        }
+           
 
-        if (!strcasecmp(tokens[i], "epsilon")) 
+        if ( !strcasecmp("epsilon", arg) ) 
         {
-           pc->epsilon = atof(tokens[++i]);
-           pc->groups = (int) ((2/pc->epsilon)+1);
+            arg = strtok(NULL, CONF_SEPARATORS);
+            pc->epsilon = atof(arg);
+            pc->groups = (int) ((2/pc->epsilon)+1);
         }
 
-        if (!strcasecmp(tokens[i], "delta")) 
+        if ( !strcasecmp("delta", arg) ) 
         {
-           pc->delta = atof(tokens[++i]);
-           pc->hashtest = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
+            arg = strtok(NULL, CONF_SEPARATORS);
+            pc->delta = atof(arg);
+            pc->hashtest = (int) ((log10((double) 1/pc->delta)/log10(2))+1);
         }
 
-        if (!strcasecmp(tokens[i], "lgn")) 
-           pc->lgn = strtol(tokens[++i], &pcEnd, 10);
+        if ( !strcasecmp("lgn", arg) ){
+           arg = strtok(NULL, CONF_SEPARATORS); 
+           pc->lgn = (int) strtol(arg, &pcEnd, 10); 
+        } 
+           
+       arg = strtok(NULL, CONF_SEPARATORS);
     }
 
 
     if(positionPath)
-        sprintf(pc->LogPath, "%s/ADLog%d.txt", tokens[positionPath], pc->GatherTime);
+        sprintf(pc->LogPath, "%s/ADLog%d.txt", path, pc->GatherTime);
     else
         sprintf(pc->LogPath, "/var/log/snort/ADLog%d.txt", pc->GatherTime);
 
