@@ -35,6 +35,7 @@ VGT_type *vgt;
 FILE *fptr,*file2;
 time_t LastLogTime, CurrentTime;
 
+
 int flag=0,check=1;
 
 /************** Bloque de nuevas funciones y variables **************/
@@ -318,6 +319,8 @@ static void PreprocFunction(Packet *p,void *context)
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int *outputList;
+    int TimeInterval;
+
     int i;
     //struct in_addr addr;
 
