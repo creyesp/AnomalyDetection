@@ -314,7 +314,7 @@ static int ComputeThresh(CGT_type *cgt)
         }
     }
 
-    qsort(count, pc->hashtest, sizeof(float), compare);
+    //qsort(count, pc->hashtest, sizeof(float), compare);
     LogMessage("#packet CGT.count: %d \n",cgt->count);
 
     for(i=0; i < pc->hashtest; i++){
@@ -372,7 +372,8 @@ static void PreprocFunction(Packet *p,void *context)
     if(TimeInterval >= pc->GatherTime)
     {
         LastLogTime += pc->GatherTime;
-        LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
+        LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
+        countpaket=0;
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
@@ -384,11 +385,11 @@ static void PreprocFunction(Packet *p,void *context)
             
             outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
             LogMessage("NUMERO DE SALIDAS; %d\n",outputList[0]);
-            for(i=1; i < outputList[0]; i++)
+            for(i=1; i <= outputList[0]; i++)
             {
                 //addr = (struct in_addr) outputList[i] ;
                 //LogMessage("%s - %s  ||  %s\n",OldTimeStamp,NewTimeStamp, inet_ntoa(addr));
-                LogMessage("%s - %s  ||  %d\n",OldTimeStamp,NewTimeStamp, outputList[i]);
+                LogMessage("CANDIDATO ==> %d\n", outputList[i]);
             }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
