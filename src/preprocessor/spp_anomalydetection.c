@@ -37,6 +37,7 @@ VGT_type *vgt;
 
 FILE *fptr,*file2;
 time_t LastLogTime, CurrentTime;
+int countpaket;
 
 
 int flag=0,check=1;
@@ -161,6 +162,8 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     /* Agrega a la session_api para que el preprocesador reciba los paquetes desde la entrada */
     session_api->enable_preproc_all_ports( sc, PP_SFPORTSCAN, PROTO_BIT__ALL );
 
+    countpaket = 0;
+
 }
 
 /* Function: ParseTemplateArgs(AnomalydetectionConfig* , char *)
@@ -187,7 +190,7 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
     char *pcEnd;
     char path[100];
 
-    if ((args == NULL) || (bo == NULL))
+    if ((args == NULL) || (pc == NULL))
         return;
 
     arg = strtok(args, CONF_SEPARATORS);
@@ -276,6 +279,7 @@ static void addCGT(Packet *p)
         packetsize = 1;
         CGT_Update(cgt, ip, packetsize); 
         VGT_Update(vgt, ip, packetsize); 
+        countpaket++;
     }
 }
 
@@ -368,6 +372,7 @@ static void PreprocFunction(Packet *p,void *context)
     if(TimeInterval >= pc->GatherTime)
     {
         LastLogTime += pc->GatherTime;
+        LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
