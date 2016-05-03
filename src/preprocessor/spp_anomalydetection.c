@@ -279,7 +279,6 @@ static void addCGT(Packet *p)
         packetsize = 1;
         CGT_Update(cgt, ip, packetsize); 
         VGT_Update(vgt, ip, packetsize); 
-        countpaket++;
     }
 }
 
@@ -338,8 +337,6 @@ static int ComputeThresh(CGT_type *cgt)
 
 static void PreprocFunction(Packet *p,void *context)
 {   
-
-
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
@@ -363,11 +360,10 @@ static void PreprocFunction(Packet *p,void *context)
         fclose(file2);
         flag=1;
     }
+    
     time( &CurrentTime );
     TimeInterval = diffTime(CurrentTime,LastLogTime);
     oldtime = ctime(&LastLogTime);
-
-    strftime(OldTimeStamp,sizeof(OldTimeStamp),"%d-%m-%y %T", oldtm);
 
     if(TimeInterval >= pc->GatherTime)
     {
@@ -410,6 +406,8 @@ static void PreprocFunction(Packet *p,void *context)
     }
     else{
         addCGT(p);
+        countpaket++;
+
     } 
 }
 
