@@ -344,7 +344,8 @@ static void PreprocFunction(Packet *p,void *context)
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int *outputList;
-    int TimeInterval;
+    float TimeInterval;
+    char oldtime[30], newtime[30]; 
 
     int i;
     //struct in_addr addr;
@@ -355,18 +356,17 @@ static void PreprocFunction(Packet *p,void *context)
         if ( file2 != NULL && ftell(file2) == 0 )
         {
         LogMessage("AnomalyDetection: Creating new log file in %s.\n",pc->LogPath);
+            time( &LastLogTime );
             fprintf(file2,"hora,ip\n");
-            time(&LastLogTime);
+            
         }else LogMessage("AnomalyDetection: Opened an existing log file named AD%d.txt\n",pc->GatherTime);
         fclose(file2);
         flag=1;
     }
+    time( &CurrentTime );
+    TimeInterval = diffTime(CurrentTime,LastLogTime);
+    oldtime = ctime(&LastLogTime);
 
-    time(&CurrentTime);
-    TimeInterval=CurrentTime-LastLogTime;
-    char OldTimeStamp[20],NewTimeStamp[20];   
-    struct tm *oldtm,*newtm;
-    oldtm = localtime(&LastLogTime);
     strftime(OldTimeStamp,sizeof(OldTimeStamp),"%d-%m-%y %T", oldtm);
 
     if(TimeInterval >= pc->GatherTime)
@@ -379,10 +379,7 @@ static void PreprocFunction(Packet *p,void *context)
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
      
-            newtm = localtime(&LastLogTime);
-            strftime(NewTimeStamp,sizeof(NewTimeStamp),"%d-%m-%y %T", newtm);
-            LogMessage("AnomalyDetection: Loged transfer between %s - %s\n",OldTimeStamp,NewTimeStamp);
-            
+            LogMessage("AnomalyDetection: Loged transfer between %s - %s\n",oldtime,ctime(&LastLogTime));
             outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
             LogMessage("NUMERO DE SALIDAS; %d\n",outputList[0]);
             for(i=1; i <= outputList[0]; i++)
@@ -432,12 +429,13 @@ static void SaveToLog(time_t LastLogTime)
     tSfPolicyId pid = getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
 
-    char TimeStamp[30];
-    struct tm *tmp;
-    tmp = localtime(&LastLogTime);
-    strftime(TimeStamp,sizeof(TimeStamp),"%d-%m-%y,%T,%a", tmp);
+    // char TimeStamp[30];
+    // struct tm *tmp;
+    // tmp = localtime(&LastLogTime);
+    // strftime(TimeStamp,sizeof(TimeStamp),"%d-%m-%y,%T,%a", tmp);
     file2=fopen(pc->LogPath,"a");
     //fprintf(file2,"%s,%d,%llu\n", TimeStamp,pc->GatherTime,TcpCountFp);
+    fprintf(file2,"%s,%d\n", ctime(&LastLogTime),pc->GatherTime);
     fclose(file2);
 }
 
