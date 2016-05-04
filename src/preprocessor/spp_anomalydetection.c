@@ -327,7 +327,7 @@ static int ComputeThresh(CGT_type *cgt)
 
 static time_t increaseTime(time_t timec, int delta){
     struct tm* tm = localtime(&timec);
-    tm->tmsec += delta;
+    tm->tm_sec += delta;
     return mktime(tm);
 }
 /* Function: PreprocFunction(Packet *)
@@ -372,7 +372,6 @@ static void PreprocFunction(Packet *p,void *context)
     }
     
     time( &CurrentTime );
-    LogMessage("%s",ctime(&CurrentTime));
     TimeInterval = difftime(CurrentTime,LastLogTime);
     oldtime = ctime(&LastLogTime);
 
