@@ -9,7 +9,6 @@
 #include <ctype.h>
 #include <rpc/types.h>
 #include <time.h>
-#include <sys/timeb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -163,6 +162,8 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     session_api->enable_preproc_all_ports( sc, PP_SFPORTSCAN, PROTO_BIT__ALL );
 
     countpaket = 0;
+    ReadLog();
+
 
 }
 
@@ -317,7 +318,7 @@ static int ComputeThresh(CGT_type *cgt)
     LogMessage("#packet CGT.count: %d \n",cgt->count);
 
     for(i=0; i < pc->hashtest; i++){
-        LogMessage("count %d: %d  \n",i, count[i]);
+        LogMessage("count %d: %f  \n",i, count[i]);
     }
     LogMessage("Thresh: %d \n",(int) (pc->phi*count[(int)pc->hashtest/2]));
 
@@ -342,7 +343,7 @@ static void PreprocFunction(Packet *p,void *context)
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int *outputList;
     float TimeInterval;
-    char oldtime[30], newtime[30]; 
+    char *oldtime;
 
     int i;
     //struct in_addr addr;
@@ -438,6 +439,41 @@ static void SaveToLog(time_t LastLogTime)
 }
 
 
+static void ReadLog(void)
+{
+    tSfPolicyId pid = getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
+    
+    char string[1000];
+    char str [17];
+    // fptr = fopen(FullPathName, "r");
+    fptr = fopen(pc->LogPath, "r");
+    if (fptr!=NULL)
+    {
+        LogMessage("----------AD-ReadLog: Log file opened.\n");
+        while(1)
+            if(fgets(string,600,fptr)==NULL)
+                break;
+        fclose(fptr);
+        strncpy(str,string,17);
+
+        struct tm tm;
+        time_t LastlognTime;
+        time(&LastLogTime);
+        
+        if (strptime(str,"%d-%m-%y,%H:%M:%S", &tm) != NULL)
+        {
+            LastlognTime = mktime(&tm);
+           
+            if (LastlognTime == -1)
+                LogMessage("----------AD-ReadLog: Can't read last login time.\n");
+            else 
+                LastLogTime = CompleteLog(LastlognTime,LastLogTime);
+        }
+        else LogMessage("----------AD-ReadLog: Can't read last login time.\n");
+    }
+    else LogMessage("----------AD-ReadLog: Log file doesn't exist.\n");
+}
 //-------------------------------------------------------------------------
 // printing stuff
 //------------------------------------------------------------------------
