@@ -362,8 +362,8 @@ static void PreprocFunction(Packet *p,void *context)
     }
     
     time( &CurrentTime );
-    printf("%s",ctime(&CurrentTime))
-    TimeInterval = diffTime(CurrentTime,LastLogTime);
+    printf("%s",ctime(&CurrentTime));
+    TimeInterval = difftime(CurrentTime,LastLogTime);
     oldtime = ctime(&LastLogTime);
 
     if(TimeInterval >= pc->GatherTime)
