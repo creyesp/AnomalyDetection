@@ -325,7 +325,11 @@ static int ComputeThresh(CGT_type *cgt)
 
 }
 
-
+static time_t increaseTime(time_t timec, int delta){
+    struct tm* tm = localtime(&timec);
+    tm->tmsec += delta;
+    return mktime(tm);
+}
 /* Function: PreprocFunction(Packet *)
  *
  * Purpose: Main preprocessor function. Aalerts and logs are generated here.
@@ -352,23 +356,29 @@ static void PreprocFunction(Packet *p,void *context)
         file2=fopen(pc->LogPath,"a");
         if ( file2 != NULL && ftell(file2) == 0 )
         {
-        LogMessage("AnomalyDetection: Creating new log file in %s.\n",pc->LogPath);
+            LogMessage("AnomalyDetection: Creating new log file in %s.\n",pc->LogPath);
             time( &LastLogTime );
             fprintf(file2,"hora,ip\n");
-            
+            time( &CurrentTime );
+            LogMessage("%s",ctime(&CurrentTime));
+            TimeInterval = difftime(CurrentTime,LastLogTime);
+            while(TimeInterval > pc->GatherTime){
+                time( &LastLogTime );
+                TimeInterval = difftime(CurrentTime,LastLogTime);
+            }   
         }else LogMessage("AnomalyDetection: Opened an existing log file named AD%d.txt\n",pc->GatherTime);
         fclose(file2);
         flag=1;
     }
     
     time( &CurrentTime );
-    printf("%s",ctime(&CurrentTime));
+    LogMessage("%s",ctime(&CurrentTime));
     TimeInterval = difftime(CurrentTime,LastLogTime);
     oldtime = ctime(&LastLogTime);
 
     if(TimeInterval >= pc->GatherTime)
     {
-        LastLogTime += pc->GatherTime;
+        LastLogTime = increaseTime(LastLogTime, pc->GatherTime);
         LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
         countpaket=0;
 
