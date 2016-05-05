@@ -374,13 +374,12 @@ static void PreprocFunction(Packet *p,void *context)
     if(TimeInterval >= pc->GatherTime)
     {
         LastLogTime = increaseTime(LastLogTime, pc->GatherTime);
-        countpaket=0;
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
      
-            LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
+            LogMessage("AnomalyDetection log time:  %s",ctime(&LastLogTime));
             LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
             for(i=1; i <= outputList[0]; i++)
@@ -406,6 +405,8 @@ static void PreprocFunction(Packet *p,void *context)
         // PREPROC_PROFILE_START(ad_perf_stats);
         addCGT(p); //agrega el nuevo paquete a la estructura
         // PREPROC_PROFILE_END(ad_perf_stats);
+        countpaket=0;
+
     }
     else{
         addCGT(p);
@@ -436,7 +437,7 @@ static void SaveToLog(time_t LastLogTime)
     // strftime(TimeStamp,sizeof(TimeStamp),"%d-%m-%y,%T,%a", tmp);
     file2=fopen(pc->LogPath,"a");
     //fprintf(file2,"%s,%d,%llu\n", TimeStamp,pc->GatherTime,TcpCountFp);
-    fprintf(file2,"%s\n", ctime(&LastLogTime));
+    fprintf(file2,"%s", ctime(&LastLogTime));
     fclose(file2);
 }
 
