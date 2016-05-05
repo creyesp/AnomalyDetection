@@ -275,10 +275,12 @@ static void addCGT(Packet *p)
     if(p->tcph!=NULL)
     {
         psrc = GET_SRC_IP(p);
-        ip = (unsigned int) psrc->ip32;
-        packetsize = 1;
-        CGT_Update(cgt, ip, packetsize); 
-        VGT_Update(vgt, ip, packetsize); 
+        if(psrc->bits == 32){
+            ip = (unsigned int) psrc->ip32[0];
+            packetsize = 1;
+            CGT_Update(cgt, ip, packetsize); 
+            VGT_Update(vgt, ip, packetsize); 
+        }
     }
 }
 
@@ -392,7 +394,7 @@ static void PreprocFunction(Packet *p,void *context)
             {
                 //addr = (struct in_addr) outputList[i] ;
                 //LogMessage("%s - %s  ||  %s\n",OldTimeStamp,NewTimeStamp, inet_ntoa(addr));
-                LogMessage("CANDIDATO ==> %d\n", outputList[i]);
+                LogMessage("CANDIDATO ==> %u.%u.%u.%u" ,(outputList[i] & 0xff000000) >> 24,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x000000ff))
             }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
