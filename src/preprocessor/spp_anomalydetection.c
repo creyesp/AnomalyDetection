@@ -304,8 +304,9 @@ static int ComputeThresh(CGT_type *cgt)
     tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
 
-    int ihash, jgroup, i;
+    int ihash, jgroup, i, thresh;
     float count[pc->hashtest];
+
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
@@ -315,16 +316,10 @@ static int ComputeThresh(CGT_type *cgt)
         }
     }
 
-    //qsort(count, pc->hashtest, sizeof(float), compare);
-    LogMessage("#packet CGT.count: %d \n",cgt->count);
-
-    for(i=0; i < pc->hashtest; i++){
-        LogMessage("count %d: %f  \n",i, count[i]);
-    }
-    LogMessage("Thresh: %d \n",(int) (pc->phi*count[(int)pc->hashtest/2]));
-
-    return (int) (pc->phi*count[(int)pc->hashtest/2]);
-
+    qsort(count, pc->hashtest, sizeof(float), compare);
+    thresh = (int) (pc->phi*count[(int)pc->hashtest/2];
+    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
+    return thresh;
 }
 
 static time_t increaseTime(time_t timec, int delta){
@@ -348,10 +343,8 @@ static void PreprocFunction(Packet *p,void *context)
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int *outputList;
     double TimeInterval;
-    char *oldtime;
 
     int i;
-    //struct in_addr addr;
 
     if(flag==0) //check if it is new file, all new log files need to have header
     {
@@ -368,33 +361,31 @@ static void PreprocFunction(Packet *p,void *context)
                 time( &LastLogTime );
                 TimeInterval = difftime(CurrentTime,LastLogTime);
             }   
-        }else LogMessage("AnomalyDetection: Opened an existing log file named AD%d.txt\n",pc->GatherTime);
+        }else{
+            LogMessage("AnomalyDetection: Opened an existing log file named AD%d.txt\n",pc->GatherTime);
+            time( &LastLogTime );
+        }
         fclose(file2);
         flag=1;
     }
-    
     time( &CurrentTime );
     TimeInterval = difftime(CurrentTime,LastLogTime);
-    oldtime = ctime(&LastLogTime);
 
     if(TimeInterval >= pc->GatherTime)
     {
         LastLogTime = increaseTime(LastLogTime, pc->GatherTime);
-        LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
         countpaket=0;
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
      
-            LogMessage("AnomalyDetection: Loged transfer between %s - %s\n",oldtime,ctime(&LastLogTime));
+            LogMessage("AnomalyDetection log time:  %s\n",,ctime(&LastLogTime));
+            LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
-            LogMessage("NUMERO DE SALIDAS; %d\n",outputList[0]);
             for(i=1; i <= outputList[0]; i++)
             {
-                //addr = (struct in_addr) outputList[i] ;
-                //LogMessage("%s - %s  ||  %s\n",OldTimeStamp,NewTimeStamp, inet_ntoa(addr));
-                LogMessage("CANDIDATO ==> %u.%u.%u.%u" ,(outputList[i] & 0xff000000) >> 24,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x000000ff))
+                LogMessage("CANDIDATO ==> %u.%u.%u.%u\n" ,(outputList[i] & 0x000000ff),,(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0xff000000) >> 24);
             }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
@@ -445,7 +436,7 @@ static void SaveToLog(time_t LastLogTime)
     // strftime(TimeStamp,sizeof(TimeStamp),"%d-%m-%y,%T,%a", tmp);
     file2=fopen(pc->LogPath,"a");
     //fprintf(file2,"%s,%d,%llu\n", TimeStamp,pc->GatherTime,TcpCountFp);
-    fprintf(file2,"%s,%d\n", ctime(&LastLogTime),pc->GatherTime);
+    fprintf(file2,"%s\n", ctime(&LastLogTime));
     fclose(file2);
 }
 
