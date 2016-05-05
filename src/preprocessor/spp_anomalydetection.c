@@ -317,7 +317,7 @@ static int ComputeThresh(CGT_type *cgt)
     }
 
     qsort(count, pc->hashtest, sizeof(float), compare);
-    thresh = (int) (pc->phi*count[(int)pc->hashtest/2];
+    thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
     LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
     return thresh;
 }
@@ -380,12 +380,12 @@ static void PreprocFunction(Packet *p,void *context)
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
      
-            LogMessage("AnomalyDetection log time:  %s\n",,ctime(&LastLogTime));
+            LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
             for(i=1; i <= outputList[0]; i++)
             {
-                LogMessage("CANDIDATO ==> %u.%u.%u.%u\n" ,(outputList[i] & 0x000000ff),,(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0xff000000) >> 24);
+                LogMessage("CANDIDATO ==> %u.%u.%u.%u\n" ,(outputList[i] & 0x000000ff),(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0xff000000) >> 24);
             }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
