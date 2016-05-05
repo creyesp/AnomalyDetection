@@ -272,7 +272,7 @@ static void addCGT(Packet *p)
     int packetsize;
     sfip_t *psrc;
 
-    if(p->tcph!=NULL)
+    if(p->orig_tcph!=NULL)
     {
         psrc = GET_SRC_IP(p);
         if(psrc->bits == 32){
@@ -282,8 +282,40 @@ static void addCGT(Packet *p)
             VGT_Update(vgt, ip, packetsize); 
         }
     }
-}
+    LogMessage("************************************************")
+    if(p->iph != NULL){
+            LogMessage("iph srd ip %s\n",sfip_to_str(p->iph->ip_src));
+            LogMessage("iph srd ip %s\n",sfip_to_str(p->iph->ip_dst));
+    }
+        if(p->orig_iph != NULL){
+            LogMessage("orig_iph srd ip %s\n",sfip_to_str(p->orig_iph->ip_src));
+            LogMessage("orig_iph srd ip %s\n",sfip_to_str(p->orig_iph->ip_dst));
+    }
+        if(p->inner_iph != NULL){
+            LogMessage("inner_iph srd ip %s\n",sfip_to_str(p->inner_iph->ip_src));
+            LogMessage("inner_iph srd ip %s\n",sfip_to_str(p->inner_iph->ip_dst));
+    }
+         if(p->outer_iph != NULL){
+            LogMessage("outer_iph srd ip %s\n",sfip_to_str(p->outer_iph->ip_src));
+            LogMessage("outer_iph srd ip %s\n",sfip_to_str(p->outer_iph->ip_dst));
+    }
+    LogMessage("dsize: %d, sp: %d, dp: %d, orig_sp: %d,orig_dp: %d, app protocol: %d\n",p-dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal 
+);
 
+            // p->iph                          //*IPHdr
+            // p->orig_iph                     //*IPHdr
+            // p->inner_iph                    //*IPHdr
+            // p->outer_iph                    //*IPHdr
+            // p->tcph                         //*TCPHdr
+            // p->orig_tcph                    //*TCPHdr
+            // p-dsize                           //uint16_t
+            // p->sp                              //uint16_t
+            // p->dp                         //uint16_t
+            // p->orig_sp                       //uint16_t
+            // p->orig_dp                       //uint16_t
+            // p->application_protocol_ordinal  //int16_t
+    }
+}
 
 static int compare(const void * a, const void * b)
 {
