@@ -65,7 +65,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args);
 static void ParseAnomalyDetectionArgs(AnomalydetectionConfig*, char *);
 static void PreprocFunction(Packet *, void *);
 static void SaveToLog(time_t);
-static void SavetoNetFlof(char *)
+static void SavetoNetFlof(char *);
 static void PrintConf_AD (const AnomalydetectionConfig*);
 
 /************** RELOAD ****************************/
@@ -163,7 +163,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     session_api->enable_preproc_all_ports( sc, PP_SFPORTSCAN, PROTO_BIT__ALL );
 
     countpaket = 0;
-    dataflow = fopen('/var/log/snort/dataflow.txt',"a");
+    dataflow = fopen("/var/log/snort/dataflow.txt","a");
 
 
 }
@@ -480,7 +480,7 @@ static void PreprocFunction(Packet *p,void *context)
  */
 static void SavetoNetFlof(char * data){
     if(data != NULL)
-        fprintf(dataflow,"%s", &data);
+        fprintf(dataflow,"%s", data);
 
 }
 static void SaveToLog(time_t LastLogTime)
