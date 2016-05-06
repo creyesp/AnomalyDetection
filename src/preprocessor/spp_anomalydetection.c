@@ -34,7 +34,7 @@
 CGT_type *cgt, *cgt_old;
 VGT_type *vgt;
 
-FILE *fptr,*file2, dataflow;
+FILE *fptr,*file2, *dataflow;
 time_t LastLogTime, CurrentTime;
 int countpaket;
 
@@ -65,6 +65,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args);
 static void ParseAnomalyDetectionArgs(AnomalydetectionConfig*, char *);
 static void PreprocFunction(Packet *, void *);
 static void SaveToLog(time_t);
+static void SavetoNetFlof(char *)
 static void PrintConf_AD (const AnomalydetectionConfig*);
 
 /************** RELOAD ****************************/
@@ -162,7 +163,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     session_api->enable_preproc_all_ports( sc, PP_SFPORTSCAN, PROTO_BIT__ALL );
 
     countpaket = 0;
-    dataflow=fopen("/var/log/snort/dataflow.txt","a");
+    dataflow = fopen('/var/log/snort/dataflow.txt',"a");
 
 
 }
@@ -274,12 +275,6 @@ static void addCGT(Packet *p)
     sfip_t *psrc;
     char iphs[INET_ADDRSTRLEN];
     char iphd[INET_ADDRSTRLEN];
-    char iphso[INET_ADDRSTRLEN];
-    char iphdo[INET_ADDRSTRLEN];
-    char iphsi[INET_ADDRSTRLEN];
-    char iphdi[INET_ADDRSTRLEN];
-    char iphsu[INET_ADDRSTRLEN];
-    char iphdu[INET_ADDRSTRLEN];
     char * outputData;
 
     if(p->tcph!=NULL)
