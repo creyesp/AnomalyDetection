@@ -271,6 +271,7 @@ static void addCGT(Packet *p)
     unsigned int ip;
     int packetsize;
     sfip_t *psrc;
+    char str[INET_ADDRSTRLEN];
 
     if(p->orig_tcph!=NULL)
     {
@@ -282,25 +283,18 @@ static void addCGT(Packet *p)
             VGT_Update(vgt, ip, packetsize); 
         }
     }
-    LogMessage("************************************************")
-    if(p->iph != NULL){
-            LogMessage("iph srd ip %s\n",sfip_to_str(p->iph->ip_src));
-            LogMessage("iph srd ip %s\n",sfip_to_str(p->iph->ip_dst));
-    }
-        if(p->orig_iph != NULL){
-            LogMessage("orig_iph srd ip %s\n",sfip_to_str(p->orig_iph->ip_src));
-            LogMessage("orig_iph srd ip %s\n",sfip_to_str(p->orig_iph->ip_dst));
-    }
-        if(p->inner_iph != NULL){
-            LogMessage("inner_iph srd ip %s\n",sfip_to_str(p->inner_iph->ip_src));
-            LogMessage("inner_iph srd ip %s\n",sfip_to_str(p->inner_iph->ip_dst));
-    }
-         if(p->outer_iph != NULL){
-            LogMessage("outer_iph srd ip %s\n",sfip_to_str(p->outer_iph->ip_src));
-            LogMessage("outer_iph srd ip %s\n",sfip_to_str(p->outer_iph->ip_dst));
-    }
-    LogMessage("dsize: %d, sp: %d, dp: %d, orig_sp: %d,orig_dp: %d, app protocol: %d\n",p-dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal 
-);
+    LogMessage("************************************************\n");
+    //iph srd ip| iph dst ip | orig_iph srd ip | orig_iph dst ip | inner_iph srd ip | inner_iph dst ip | outer_iph srd ip | outer_iph dst ip  | dsize |sp | dp | orig_sp | orig_dp | app protocol
+    LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | | %d | %d | %d | %d\n",inet_ntop(AF_INET,&p->iph->ip_src,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->iph->ip_dst,str,INET_ADDRSTRLEN,\ 
+                            inet_ntop(AF_INET,&p->orig_iph->ip_src,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->orig_iph->ip_dst,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->inner_iph->ip_src,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->inner_iph->ip_dst,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->outer_iph->ip_src,str,INET_ADDRSTRLEN,\
+                            inet_ntop(AF_INET,&p->outer_iph->ip_dst,str,INET_ADDRSTRLEN,\
+                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal\
+                            );
 
             // p->iph                          //*IPHdr
             // p->orig_iph                     //*IPHdr
@@ -314,7 +308,6 @@ static void addCGT(Packet *p)
             // p->orig_sp                       //uint16_t
             // p->orig_dp                       //uint16_t
             // p->application_protocol_ordinal  //int16_t
-    }
 }
 
 static int compare(const void * a, const void * b)
