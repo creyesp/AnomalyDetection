@@ -271,7 +271,14 @@ static void addCGT(Packet *p)
     unsigned int ip;
     int packetsize;
     sfip_t *psrc;
-    char str[INET_ADDRSTRLEN];
+    char iphs[INET_ADDRSTRLEN];
+    char iphd[INET_ADDRSTRLEN];
+    char iphso[INET_ADDRSTRLEN];
+    char iphdo[INET_ADDRSTRLEN];
+    char iphsi[INET_ADDRSTRLEN];
+    char iphdi[INET_ADDRSTRLEN];
+    char iphsu[INET_ADDRSTRLEN];
+    char iphdu[INET_ADDRSTRLEN];
 
     if(p->tcph!=NULL)
     {
@@ -286,15 +293,17 @@ static void addCGT(Packet *p)
     if(p->iph != NULL){
         LogMessage("************************************************\n");
         //iph srd ip| iph dst ip | orig_iph srd ip | orig_iph dst ip | inner_iph srd ip | inner_iph dst ip | outer_iph srd ip | outer_iph dst ip  | dsize |sp | dp | orig_sp | orig_dp | app protocol
-        LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | | %d | %d | %d | %dn",inet_ntop(AF_INET,&p->iph->ip_src,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->iph->ip_dst,str,INET_ADDRSTRLEN),\ 
-                            inet_ntop(AF_INET,&p->orig_iph->ip_src,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->orig_iph->ip_dst,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->inner_iph->ip_src,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->inner_iph->ip_dst,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->outer_iph->ip_src,str,INET_ADDRSTRLEN),\
-                            inet_ntop(AF_INET,&p->outer_iph->ip_dst,str,INET_ADDRSTRLEN),\
-                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal);
+        inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->orig_iph->ip_src,iphso,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->orig_iph->ip_dst,iphdo,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->inner_iph->ip_src,iphsi,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->inner_iph->ip_dst,iphdi,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->outer_iph->ip_src,iphsu,INET_ADDRSTRLEN),
+        inet_ntop(AF_INET,&p->outer_iph->ip_dst,iphdu,INET_ADDRSTRLEN),
+        LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | %d | %d | %d | %d | %s\n",
+                            iphs,iphd,iphso,iphdo,iphsi,iphdi,iphsu,iphdu,
+                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal,p->application_protocol_ordinal);
     }
    
             // p->iph                          //*IPHdr
