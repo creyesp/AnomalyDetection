@@ -34,7 +34,7 @@
 CGT_type *cgt, *cgt_old;
 VGT_type *vgt;
 
-FILE *fptr,*file2;
+FILE *fptr,*file2, dataflow;
 time_t LastLogTime, CurrentTime;
 int countpaket;
 
@@ -162,6 +162,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     session_api->enable_preproc_all_ports( sc, PP_SFPORTSCAN, PROTO_BIT__ALL );
 
     countpaket = 0;
+    dataflow=fopen("/var/log/snort/dataflow.txt","a");
 
 
 }
@@ -279,6 +280,7 @@ static void addCGT(Packet *p)
     char iphdi[INET_ADDRSTRLEN];
     char iphsu[INET_ADDRSTRLEN];
     char iphdu[INET_ADDRSTRLEN];
+    char * outputData;
 
     if(p->tcph!=NULL)
     {
@@ -290,21 +292,32 @@ static void addCGT(Packet *p)
             VGT_Update(vgt, ip, packetsize); 
         }
     }
-    if(p->iph != NULL){
-        LogMessage("************************************************\n");
-        //iph srd ip| iph dst ip | orig_iph srd ip | orig_iph dst ip | inner_iph srd ip | inner_iph dst ip | outer_iph srd ip | outer_iph dst ip  | dsize |sp | dp | orig_sp | orig_dp | app protocol
-        inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->orig_iph->ip_src,iphso,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->orig_iph->ip_dst,iphdo,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->inner_iph->ip_src,iphsi,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->inner_iph->ip_dst,iphdi,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->outer_iph->ip_src,iphsu,INET_ADDRSTRLEN),
-        inet_ntop(AF_INET,&p->outer_iph->ip_dst,iphdu,INET_ADDRSTRLEN),
-        LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | %d | %d | %d | %d | %s\n",
-                            iphs,iphd,iphso,iphdo,iphsi,iphdi,iphsu,iphdu,
-                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal,p->application_protocol_ordinal);
-    }
+       
+        if(p->iph!= NULL){
+            inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
+            LogMessage("%s | ", iphs);
+            inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
+            LogMessage("%s | ", iphd);
+            LogMessage("%d | ", p->dsize);
+            LogMessage("%u | ", p->sp);
+            LogMessage("%u | ", p->dp); 
+            LogMessage("%u | ",p->iph->ip_len);
+            LogMessage("%u | ",p->pkth->pktlen);
+            LogMessage("%u | ",p->iph->ip_proto);
+            if(p->tcph != NULL){
+                LogMessage("%u \n", p->tcph->th_flags);            
+                sprintf(outputData,"%s | %s | %d | %u | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
+            }
+            else{
+                LogMessage("\n");
+                sprintf(outputData,"%s | %s | %d | %u | %u | %u | %u | %u | \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);
+            }
+            
+            
+            SavetoNetFlof( outputData );
+        }
+            
+
    
             // p->iph                          //*IPHdr
             // p->orig_iph                     //*IPHdr
@@ -318,6 +331,16 @@ static void addCGT(Packet *p)
             // p->orig_sp                       //uint16_t
             // p->orig_dp                       //uint16_t
             // p->application_protocol_ordinal  //int16_t
+            // uint16_t max_dsize;
+            // uint16_t ip_dsize; 
+            // uint16_t alt_dsize;
+            // const uint8_t *data;        /* packet payload pointer */
+            // const uint8_t *ip_data;     /* IP payload pointer */ 
+            // const TCPHdr *tcph, *orig_tcph;
+            // const UDPHdr *udph, *orig_udph;
+            // const UDPHdr *inner_udph;   /* if Teredo + UDP, this will be the inner UDP header */
+            // const UDPHdr *outer_udph;   
+            // (DAQ_PktHdr_t*)p->pkth)->pktlen 
 }
 
 static int compare(const void * a, const void * b)
@@ -460,7 +483,11 @@ static void PreprocFunction(Packet *p,void *context)
  *
  * Returns: void function
  */
+static void SavetoNetFlof(char * data){
+    if(data != NULL)
+        fprintf(dataflow,"%s", &data);
 
+}
 static void SaveToLog(time_t LastLogTime)
 {
     tSfPolicyId pid = getNapRuntimePolicy();
@@ -550,6 +577,8 @@ static void AD_CleanExit(int signal, void* foo)
         //implementación de cosas que hacer antes de que snort se cierre
     }
     Preproc_FreeSet(ad_context);
+    fclose(dataflow);
+
 }
 
 static void AD_Reset (int signal, void *foo) { }
