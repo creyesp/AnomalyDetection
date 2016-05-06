@@ -480,7 +480,7 @@ static void PreprocFunction(Packet *p,void *context)
  */
 static void SavetoNetFlof(char * data){
     if(data != NULL)
-        fprintf(dataflow,"%s", data);
+        fprintf(dataflow,"%s", &data);
 
 }
 static void SaveToLog(time_t LastLogTime)
