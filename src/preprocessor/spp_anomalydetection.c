@@ -273,7 +273,7 @@ static void addCGT(Packet *p)
     sfip_t *psrc;
     char str[INET_ADDRSTRLEN];
 
-    if(p->orig_tcph!=NULL)
+    if(p->tcph!=NULL)
     {
         psrc = GET_SRC_IP(p);
         if(psrc->bits == 32){
@@ -283,19 +283,20 @@ static void addCGT(Packet *p)
             VGT_Update(vgt, ip, packetsize); 
         }
     }
-    LogMessage("************************************************\n");
-    //iph srd ip| iph dst ip | orig_iph srd ip | orig_iph dst ip | inner_iph srd ip | inner_iph dst ip | outer_iph srd ip | outer_iph dst ip  | dsize |sp | dp | orig_sp | orig_dp | app protocol
-    LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | | %d | %d | %d | %d\n",inet_ntop(AF_INET,&p->iph->ip_src,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->iph->ip_dst,str,INET_ADDRSTRLEN,\ 
-                            inet_ntop(AF_INET,&p->orig_iph->ip_src,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->orig_iph->ip_dst,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->inner_iph->ip_src,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->inner_iph->ip_dst,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->outer_iph->ip_src,str,INET_ADDRSTRLEN,\
-                            inet_ntop(AF_INET,&p->outer_iph->ip_dst,str,INET_ADDRSTRLEN,\
-                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal\
-                            );
-
+    if(p->iph != NULL){
+        LogMessage("************************************************\n");
+        //iph srd ip| iph dst ip | orig_iph srd ip | orig_iph dst ip | inner_iph srd ip | inner_iph dst ip | outer_iph srd ip | outer_iph dst ip  | dsize |sp | dp | orig_sp | orig_dp | app protocol
+        LogMessage("%s | %s | %s | %s | %s | %s | %s | %s | %d | | %d | %d | %d | %dn",inet_ntop(AF_INET,&p->iph->ip_src,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->iph->ip_dst,str,INET_ADDRSTRLEN),\ 
+                            inet_ntop(AF_INET,&p->orig_iph->ip_src,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->orig_iph->ip_dst,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->inner_iph->ip_src,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->inner_iph->ip_dst,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->outer_iph->ip_src,str,INET_ADDRSTRLEN),\
+                            inet_ntop(AF_INET,&p->outer_iph->ip_dst,str,INET_ADDRSTRLEN),\
+                            p->dsize, p->sp, p->dp, p->orig_sp, p->orig_dp, p->application_protocol_ordinal);
+    }
+   
             // p->iph                          //*IPHdr
             // p->orig_iph                     //*IPHdr
             // p->inner_iph                    //*IPHdr
