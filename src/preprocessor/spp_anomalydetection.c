@@ -154,7 +154,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     ParseAnomalyDetectionArgs(ad_Config, args);
     /* Inicializa los grupos para almacenar sketches*/
     cgt = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
-    vgt = VGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    vgt = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
     /* Agrega el preprocesar a una lista con prioridades al momento de acceder al dato bruto */
     AddFuncToPreprocList( sc, PreprocFunction, PRIORITY_SCANNER,  PP_SFPORTSCAN, PROTO_BIT__ALL);
@@ -457,7 +457,7 @@ static void PreprocFunction(Packet *p,void *context)
             CGT_Destroy(cgt);
             VGT_Destroy(vgt);
             cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
-            vgt = VGT_Init(pc->groups,pc->hashtest,pc->lgn);
+            vgt = VGT_Init(pc->groups,pc->hashtest);
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
