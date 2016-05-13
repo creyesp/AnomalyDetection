@@ -281,8 +281,8 @@ static void addCGT(Packet *p)
     {
         psrc = GET_SRC_IP(p);
         if(psrc->bits == 32){
-            ipsrc = p->iph->ip_src->s_addr ;
-            ipdst = p->iph->ip_dst->s_addr ;
+            ipsrc = p->iph->ip_src.s_addr ;
+            ipdst = p->iph->ip_dst.s_addr ;
             srcport = (unsigned short int)p->sp;
             dstport = (unsigned short int)p->dp;
             packetsize = 1;
