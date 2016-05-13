@@ -405,8 +405,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output it
+                  printf("%u - %u - %u | ",guess[0],guess[1],guess[2]);
                   results[hits]=guess;
-
+                  printf("%u - %u - %u | ",results[hits][0], results[hits][1], results[hits][2]);
                   hits++;
                 }
             }
