@@ -74,9 +74,9 @@ void loginsert96(int *lists, unsigned int val1, unsigned int val2, unsigned int 
   }
 }
 /************************************************************************/
-/*
+/*                                                                      */
 /*  Funciones de creacion modificacion y eliminacion de estructuras CGT */
-/*
+/*                                                                      */
 /************************************************************************/
 
 CGT_type * CGT_Init(int buckets, int tests, int lgn)
@@ -137,7 +137,7 @@ unsigned int testCGT(int *count, int nbit, int thresh)
   int t, tc;
   int c;
   unsigned int bit;
-  unsigned int output;
+  unsigned int output = 0;
 
   if(count[0]>=thresh)  //the first test
   {
@@ -187,11 +187,11 @@ unsigned int * testCGT96(int *count, int nbit, int thresh)
       output += bit; 
       if(c == 32){
         result[0] = output;
-        output = 0
+        output = 0;
       }
       if(c == 64){
         result[1] = output;
-        output = 0        
+        output = 0  ;      
       }
     }
     result[2] = output;
@@ -350,7 +350,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   int claimed=0;  
   int testval=0;
   int pass = 0;
-  unsigned int hash,hash1,has2,has3;
+  unsigned int hash,hash1,hash2,hash3;
   
   results=calloc(cgt->tests*cgt->buckets,sizeof(unsigned int*));
   if (results==NULL) exit(1); 
@@ -364,7 +364,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
     {
       for (j=0; j<cgt->buckets; j++)      
         {      
-          guess=testCGT(cgt->counts[testval],cgt->logn,thresh);
+          guess = (unsigned int *)testCGT96(cgt->counts[testval],cgt->logn,thresh);
           // go into the group, and see if there is a frequent item there
           // then check item does hash into that group... 
           if (guess != NULL) 
@@ -437,7 +437,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       //         last=results[i];
       //       }
       //   } 
-      compresults = (unsigned int *)calloc(hits+1,sizeof(unsigned int *));
+      compresults = (unsigned int **)calloc(hits+1,sizeof(unsigned int *));
       compresults[0][0]=hits;    
       for (i=0;i <= hits;i++)
         { 
@@ -446,7 +446,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
     }
   else
     {
-      compresults=(unsigned int *) malloc(sizeof(unsigned int));
+      compresults=(unsigned int **) malloc(sizeof(unsigned int*));
       compresults[0]=NULL;
     }
   for(i = 0; i < cgt->tests*cgt->buckets; i++)
@@ -478,9 +478,9 @@ void CGT_Destroy(CGT_type * cgt)
 }
 
 /************************************************************************/
-/*
+/*                                                                      */
 /*  Funciones de creacion modificacion y eliminacion de estructuras CGT */
-/*
+/*                                                                      */
 /************************************************************************/
 
 
