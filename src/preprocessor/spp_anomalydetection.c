@@ -270,7 +270,8 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
  */
 static void addCGT(Packet *p)
 {
-    unsigned int ip;
+    unsigned int ipsrc,ipdst;
+    unsigned short int srcport, dstport;
     int packetsize;
     sfip_t *psrc;
     char iphs[INET_ADDRSTRLEN];
@@ -281,35 +282,45 @@ static void addCGT(Packet *p)
     {
         psrc = GET_SRC_IP(p);
         if(psrc->bits == 32){
-            ip = (unsigned int) psrc->ip32[0];
+            ipsrc = (unsigned int)p->iph->ip_src ;
+            ipdst = (unsigned int)p->iph->ip_dst ;
+            srcport = (unsigned short int)p->sp
+            dstport = (unsigned short int)p->dp
             packetsize = 1;
-            CGT_Update(cgt, ip, packetsize); 
-            VGT_Update(vgt, ip, packetsize); 
+            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize); 
+            VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
         }
     }
        
         if(p->iph!= NULL){
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             LogMessage("%s | ", iphs);
+            // fprintf(dataflow,"%s | ", iphs);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             LogMessage("%s | ", iphd);
+            // fprintf(dataflow,"%s | ", iphd);
             LogMessage("%d | ", p->dsize);
+            // fprintf(dataflow,"%d | ", p->dsize);
             LogMessage("%u | ", p->sp);
-            LogMessage("%u | ", p->dp); 
+            // fprintf(dataflow,"%u | ", p->sp);
+            LogMessage("%u | ", p->dp);
+            // fprintf(dataflow,"%u | ", p->dp);
             LogMessage("%u | ",p->iph->ip_len);
+            // fprintf(dataflow,"%u | ",p->iph->ip_len);
             LogMessage("%u | ",p->pkth->pktlen);
+            // fprintf(dataflow,"%u | ",p->pkth->pktlen);
             LogMessage("%u | ",p->iph->ip_proto);
+            // fprintf(dataflow,"%u | ",p->iph->ip_proto);
             if(p->tcph != NULL){
-                LogMessage("%u \n", p->tcph->th_flags);            
-                sprintf(outputData,"%s | %s | %d | %u | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
+                LogMessage("%u \n", p->tcph->th_flags);
+                // fprintf(dataflow,"%u \n", p->tcph->th_flags);
+                fprintf(dataflow,"%s | %s | %d | %u | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
                 LogMessage("\n");
-                sprintf(outputData,"%s | %s | %d | %u | %u | %u | %u | %u | \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);
-            }
-            
-            
-            SavetoNetFlof( outputData );
+                // fprintf(dataflow,"\n");
+                fprintf(dataflow,"%s | %s | %d | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);            }
+            //fprintf(dataflow,"%s", outputData); 
         }
             
 
@@ -394,7 +405,7 @@ static void PreprocFunction(Packet *p,void *context)
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-    unsigned int *outputList;
+    unsigned int **outputList;
     double TimeInterval;
 
     int i;
@@ -434,10 +445,12 @@ static void PreprocFunction(Packet *p,void *context)
      
             LogMessage("AnomalyDetection log time:  %s",ctime(&LastLogTime));
             LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
-            outputList = CGT_Output(cgt, vgt, ComputeThresh(cgt));
-            for(i=1; i <= outputList[0]; i++)
+            outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
+            for(i=1; i <= outputList[0][0]; i++)
             {
-                LogMessage("CANDIDATO ==> %u.%u.%u.%u\n" ,(outputList[i] & 0x000000ff),(outputList[i] & 0x0000ff00) >> 8,(outputList[i] & 0x00ff0000) >> 16,(outputList[i] & 0xff000000) >> 24);
+                LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
             }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
