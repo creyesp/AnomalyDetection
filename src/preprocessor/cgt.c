@@ -405,15 +405,12 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output it
-                  claimed++;
-                  LogMessage("%d",claimed);
                   results[hits]=guess;
 
                   hits++;
                 }
             }
           testval++;
-          claimed = 0;
         }
     }
   if (hits>0)
@@ -444,7 +441,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       compresults = calloc(hits+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
       for(i = 0; i <= hits; i++){
-        compresults[i] = calloc(3,sizeof(unsigned int))
+        compresults[i] = calloc(3,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
       }  
       compresults[0][0]=hits;    
