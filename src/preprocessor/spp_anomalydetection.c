@@ -292,10 +292,10 @@ static void addCGT(Packet *p)
     }
        
         if(p->iph!= NULL){
-            inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
+            inet_ntop(AF_INET,&p->iph->ip_src->s_addr,iphs,INET_ADDRSTRLEN);
             LogMessage("%s | ", iphs);
             // fprintf(dataflow,"%s | ", iphs);
-            inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
+            inet_ntop(AF_INET,&p->iph->ip_dst->s_addr,iphd,INET_ADDRSTRLEN);
             LogMessage("%s | ", iphd);
             // fprintf(dataflow,"%s | ", iphd);
             LogMessage("%d | ", p->dsize);
