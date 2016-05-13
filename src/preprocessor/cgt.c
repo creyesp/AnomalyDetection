@@ -405,11 +405,15 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output it
+                  claimed++;
+                  LogMessage("%d",claimed);
                   results[hits]=guess;
+
                   hits++;
                 }
             }
           testval++;
+          claimed = 0;
         }
     }
   if (hits>0)
@@ -437,17 +441,21 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       //         last=results[i];
       //       }
       //   } 
-      compresults = (unsigned int **)calloc(hits+1,sizeof(unsigned int *));
+      compresults = calloc(hits+1,sizeof(unsigned int *));
+      if (compresults==NULL) exit(1);
+      for(i = 0; i <= hits; i++){
+        compresults[i] = calloc(3,sizeof(unsigned int))
+        if(compresults[i] == NULL) exit(1);
+      }  
       compresults[0][0]=hits;    
-      for (i=0;i <= hits;i++)
+      for (i=0;i < hits;i++)
         { 
           compresults[i+1]=results[i];
         } 
     }
   else
     {
-      compresults=(unsigned int **) malloc(sizeof(unsigned int*));
-      compresults[0]=NULL;
+      compresults = NULL;
     }
   for(i = 0; i < cgt->tests*cgt->buckets; i++)
     free(results[i]);

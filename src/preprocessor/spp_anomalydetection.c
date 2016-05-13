@@ -293,23 +293,7 @@ static void addCGT(Packet *p)
        
         if(p->iph!= NULL){
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
-            LogMessage("%s | ", iphs);
-            // fprintf(dataflow,"%s | ", iphs);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
-            LogMessage("%s | ", iphd);
-            // fprintf(dataflow,"%s | ", iphd);
-            LogMessage("%d | ", p->dsize);
-            // fprintf(dataflow,"%d | ", p->dsize);
-            LogMessage("%u | ", p->sp);
-            // fprintf(dataflow,"%u | ", p->sp);
-            LogMessage("%u | ", p->dp);
-            // fprintf(dataflow,"%u | ", p->dp);
-            LogMessage("%u | ",p->iph->ip_len);
-            // fprintf(dataflow,"%u | ",p->iph->ip_len);
-            LogMessage("%u | ",p->pkth->pktlen);
-            // fprintf(dataflow,"%u | ",p->pkth->pktlen);
-            LogMessage("%u | ",p->iph->ip_proto);
-            // fprintf(dataflow,"%u | ",p->iph->ip_proto);
             if(p->tcph != NULL){
                 LogMessage("%u \n", p->tcph->th_flags);
                 // fprintf(dataflow,"%u \n", p->tcph->th_flags);
