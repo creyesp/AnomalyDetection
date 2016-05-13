@@ -65,7 +65,6 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args);
 static void ParseAnomalyDetectionArgs(AnomalydetectionConfig*, char *);
 static void PreprocFunction(Packet *, void *);
 static void SaveToLog(time_t);
-static void SavetoNetFlof(char *);
 static void PrintConf_AD (const AnomalydetectionConfig*);
 
 /************** RELOAD ****************************/
@@ -282,10 +281,10 @@ static void addCGT(Packet *p)
     {
         psrc = GET_SRC_IP(p);
         if(psrc->bits == 32){
-            ipsrc = (unsigned int)p->iph->ip_src ;
-            ipdst = (unsigned int)p->iph->ip_dst ;
-            srcport = (unsigned short int)p->sp
-            dstport = (unsigned short int)p->dp
+            ipsrc = p->iph->ip_src ;
+            ipdst = p->iph->ip_dst ;
+            srcport = (unsigned short int)p->sp;
+            dstport = (unsigned short int)p->dp;
             packetsize = 1;
             CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize); 
             VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
@@ -405,7 +404,7 @@ static void PreprocFunction(Packet *p,void *context)
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-    unsigned int **outputList;
+    unsigned int ** outputList;
     double TimeInterval;
 
     int i;
@@ -491,11 +490,7 @@ static void PreprocFunction(Packet *p,void *context)
  *
  * Returns: void function
  */
-static void SavetoNetFlof(char * data){
-    if(data != NULL)
-        fprintf(dataflow,"%s", &data);
 
-}
 static void SaveToLog(time_t LastLogTime)
 {
     tSfPolicyId pid = getNapRuntimePolicy();
