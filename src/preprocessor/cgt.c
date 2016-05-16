@@ -160,7 +160,8 @@ unsigned int testCGT(int *count, int nbit, int thresh)
   return output;
 }
 
-unsigned int *testCGT96(int *count, int nbit, int thresh)
+//unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
+void testCGT96(unsigned int *result, int *count, int nbit, int thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -169,7 +170,7 @@ unsigned int *testCGT96(int *count, int nbit, int thresh)
   int c;
   unsigned int bit;
   unsigned int output = 0;
-  static unsigned int result[3];
+  //static unsigned int result[3];
 
   if(count[0]>=thresh)  //the first test
   {
@@ -178,7 +179,7 @@ unsigned int *testCGT96(int *count, int nbit, int thresh)
       tc = count[0]-count[c]; //test complemento
       t = count[c]; //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
-        return NULL;
+        //return NULL;
       if( t >= thresh ) // the third test
         bit = 1;
       if( tc >= thresh )
@@ -201,8 +202,8 @@ unsigned int *testCGT96(int *count, int nbit, int thresh)
     LogMessage("%u - %u \n", (result[2]&0xffff0000)>>16,result[2]&0x0000ffff);
   }
   else
-    return NULL;
-  return (result);
+    //return NULL;
+  //return (result);
 }
 
 void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff)
@@ -357,6 +358,8 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   int pass = 0;
   unsigned int hash,hash1,hash2,hash3;
   
+  guess = calloc(3,sizeof(unsigned int));
+
   results=calloc(cgt->tests*cgt->buckets,sizeof(unsigned int*));
   if (results==NULL) exit(1); 
   for(i = 0; i < cgt->tests*cgt->buckets; i++){
@@ -369,11 +372,13 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
     {
       for (j=0; j<cgt->buckets; j++)      
         {      
-          guess = testCGT96(cgt->counts[testval],cgt->logn,thresh);
+          //guess = testCGT96(cgt->counts[testval],cgt->logn,thresh);
+          testCGT96(guess, cgt->counts[testval],cgt->logn,thresh);
           // go into the group, and see if there is a frequent item there
           // then check item does hash into that group... 
           if (guess != NULL) 
             {
+              LogMessage("La salida guess es no es NULL\n");
               hash1 = hash31(cgt->testa[i],cgt->testb[i],guess[0]);
               hash2 = hash31(cgt->testa[i],cgt->testb[i],guess[1]);
               hash3 = hash31(cgt->testa[i],cgt->testb[i],guess[2]);
@@ -381,7 +386,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash = hash % cgt->buckets; 
             }
             else{
-              LogMessage("La salida guess es NULL");
+              L
             }
           if ((guess != NULL) && (hash == j))
             {
