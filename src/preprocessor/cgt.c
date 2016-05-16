@@ -196,9 +196,9 @@ unsigned int * testCGT96(int *count, int nbit, int thresh)
     }
     result[2] = output;
     LogMessage("Test: %u - %u - %u \n", result[0], result[1], result[2]);
-    LogMessage("Test: %u.%u.%u.%u -", result[0]&0x000000ff,result[0]&0x0000ff00,result[0]&0x00ff0000,result[0]&0xff000000);
-    LogMessage("%u.%u.%u.%u -", result[1]&0x000000ff,result[1]&0x0000ff00,result[1]&0x00ff0000,result[1]&0xff000000);
-    LogMessage("%u - %u \n", result[2]&0xffff0000,result[2]&0x0000ffff);
+    LogMessage("Test: %u.%u.%u.%u -", result[0]&0x000000ff,(result[0]&0x0000ff00)>>8,(result[0]&0x00ff0000)>>16,(result[0]&0xff000000)>>)24;
+    LogMessage("%u.%u.%u.%u -", result[1]&0x000000ff,(result[1]&0x0000ff00)>>8,(result[1]&0x00ff0000)>>16,(result[1]&0xff000000)>>)24);
+    LogMessage("%u - %u \n", (result[2]&0xffff0000)>>16,result[2]&0x0000ffff);
   }
   else
     return NULL;
