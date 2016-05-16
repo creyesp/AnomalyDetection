@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "cgt.h"
 #include "prng.h"
-
+#include "util.h" //para usar LogMessage
 
 void shell(unsigned long n, unsigned int a[])
 {
@@ -373,7 +373,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash2 = hash31(cgt->testa[i],cgt->testb[i],guess[1]);
               hash3 = hash31(cgt->testa[i],cgt->testb[i],guess[2]);
               hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
-              hash=hash % cgt->buckets; 
+              hash = hash % cgt->buckets; 
             }
           if ((guess != NULL) && (hash == j))
             {
@@ -405,11 +405,11 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output i
-                  printf("salida del guess\n");
-                  printf("%u - %u - %u | ",guess[0],guess[1],guess[2]);
+                  LogMessage("salida del guess\n");
+                  LogMessage("%u - %u - %u \n",guess[0],guess[1],guess[2]);
                   results[hits]=guess;
-                  printf("salida de resuls  \n");
-                  printf("%u - %u - %u | ",results[hits][0], results[hits][1], results[hits][2]);
+                  LogMessage("salida de resuls  \n");
+                  LogMessage("%u - %u - %u \n",results[hits][0], results[hits][1], results[hits][2]);
                   hits++;
                 }
             }
