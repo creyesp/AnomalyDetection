@@ -356,29 +356,11 @@ static int ComputeThresh(CGT_type *cgt)
         for(jgroup = 0; jgroup < pc->groups; jgroup++)
         {
             count[ihash] += cgt->counts[ihash*pc->hashtest+jgroup][0];
-            LogMessage("%d|",cgt->counts[ihash*pc->hashtest+jgroup][0]);
         }
-        LogMessage("/n");
     }
 
     qsort(count, pc->hashtest, sizeof(float), compare);
     thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
-    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
-
-    for(ihash = 0; ihash < pc->hashtest; ihash++)
-    {
-        count[ihash] = 0;
-        for(jgroup = 0; jgroup < pc->groups; jgroup++)
-        {
-            if(cgt->counts[ihash*pc->hashtest+jgroup][0] > thresh){
-                for(i = 0; i < cgt->logn; i++){
-                    LogMessage("%d|",cgt->counts[ihash*pc->hashtest+jgroup][i]);
-                }
-                LogMessage("/n");
-            }
-        }
-        LogMessage("/n");
-    }
     return thresh;
 }
 
