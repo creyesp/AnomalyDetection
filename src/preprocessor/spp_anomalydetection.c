@@ -293,7 +293,7 @@ static void addCGT(Packet *p)
        
         if(p->iph!= NULL){
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
-            inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);date
+            inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             if(p->tcph != NULL){
                 fprintf(dataflow,"%s | %s | %d | %u | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
             }
@@ -346,7 +346,7 @@ static int ComputeThresh(CGT_type *cgt)
     tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
 
-    int ihash, jgroup, i, thresh;
+    int ihash, jgroup, thresh;
     float count[pc->hashtest];
 
     for(ihash = 0; ihash < pc->hashtest; ihash++)
@@ -425,7 +425,7 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             if(outputList != NULL){
-                LogMessage("Numero de salidas: %d",outputList[0][0])
+                LogMessage("Numero de salidas: %d",outputList[0][0]);
                 for(i=1; i <= outputList[0][0]; i++)
                 {
                     LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
