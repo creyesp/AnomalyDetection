@@ -179,6 +179,7 @@ void testCGT96(unsigned int *rtest, int *count, int nbit, int thresh)
       tc = count[0]-count[c]; //test complemento
       t = count[c]; //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
+        rtest = NULL;
         //return NULL;
       if( t >= thresh ) // the third test
         bit = 1;
@@ -188,14 +189,17 @@ void testCGT96(unsigned int *rtest, int *count, int nbit, int thresh)
       output += bit; 
       if(c == 32){
         result[0] = output;
+        LogMessage("%d",output);
         output = 0;
       }
       if(c == 64){
         result[1] = output;
+        LogMessage("%d",output);
         output = 0  ;      
       }
     }
     result[2] = output;
+    LogMessage("%d",output);
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
@@ -205,8 +209,9 @@ void testCGT96(unsigned int *rtest, int *count, int nbit, int thresh)
     LogMessage("%u.%u.%u.%u -", result[1]&0x000000ff,(result[1]&0x0000ff00)>>8,(result[1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
     LogMessage("%u - %u \n", (result[2]&0xffff0000)>>16,result[2]&0x0000ffff);
   }
-  //else
+  else
     //return NULL;
+    rtest = NULL;
   //return (result);
 }
 

@@ -361,6 +361,7 @@ static int ComputeThresh(CGT_type *cgt)
 
     qsort(count, pc->hashtest, sizeof(float), compare);
     thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
+    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
     return thresh;
 }
 
