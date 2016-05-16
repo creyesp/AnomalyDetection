@@ -195,6 +195,7 @@ unsigned int * testCGT96(int *count, int nbit, int thresh)
       }
     }
     result[2] = output;
+    LogMessage("Test: %u - %u - %u \n", output[0], output[1], output[2]);
   }
   else
     return NULL;
@@ -374,9 +375,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash3 = hash31(cgt->testa[i],cgt->testb[i],guess[2]);
               hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
               hash = hash % cgt->buckets; 
-            }
-            else{
-              LogMessage("la salida del guess es NULL\n");
             }
           if ((guess != NULL) && (hash == j))
             {
