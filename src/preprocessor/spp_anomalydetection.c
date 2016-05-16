@@ -355,7 +355,9 @@ static int ComputeThresh(CGT_type *cgt)
         for(jgroup = 0; jgroup < pc->groups; jgroup++)
         {
             count[ihash] += cgt->counts[ihash*pc->hashtest+jgroup][0];
+            LogMessage("%d|",cgt->counts[ihash*pc->hashtest+jgroup][0]);
         }
+        LogMessage("/n");
     }
 
     qsort(count, pc->hashtest, sizeof(float), compare);
@@ -433,7 +435,7 @@ static void PreprocFunction(Packet *p,void *context)
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
             }else
-                LogMessage("es NULL");
+                LogMessage("es NULL\n");
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
             //CGT_Destroy(cgt_aux);

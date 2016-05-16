@@ -375,6 +375,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
               hash = hash % cgt->buckets; 
             }
+            else{
+              LogMessage("la salida del guess es NULL\n");
+            }
           if ((guess != NULL) && (hash == j))
             {
               pass=1;
