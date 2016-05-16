@@ -169,7 +169,7 @@ unsigned int * testCGT96(int *count, int nbit, int thresh)
   int c;
   unsigned int bit;
   unsigned int output = 0;
-  unsigned int *result = calloc(3,sizeof(unsigned int));
+  static unsigned int result[3];
 
   if(count[0]>=thresh)  //the first test
   {
@@ -195,7 +195,7 @@ unsigned int * testCGT96(int *count, int nbit, int thresh)
       }
     }
     result[2] = output;
-    LogMessage("Test: %u - %u - %u \n", output[0], output[1], output[2]);
+    LogMessage("Test: %u - %u - %u \n", result[0], result[1], result[2]);
   }
   else
     return NULL;
@@ -248,7 +248,8 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, int thresh)
 
   int i=0,j=0,k=0;
   unsigned int guess=0;
-  unsigned int * results, *compresults;
+  unsigned int * results;
+  static unsigned int *compresults;
   unsigned long hits =0;
   int last=-1;  
   int claimed=0;  
@@ -344,7 +345,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   // Find the hot items by doing the group testing
 
   int i=0,j=0,k=0;
-  unsigned int *guess;
+  unsigned int * guess;
   unsigned int ** results, **compresults;
   unsigned long hits =0;
   int last=-1;  

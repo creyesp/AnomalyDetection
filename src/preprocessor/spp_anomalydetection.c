@@ -275,7 +275,6 @@ static void addCGT(Packet *p)
     sfip_t *psrc;
     char iphs[INET_ADDRSTRLEN];
     char iphd[INET_ADDRSTRLEN];
-    char * outputData;
 
     if(p->tcph!=NULL)
     {
@@ -372,7 +371,7 @@ static int ComputeThresh(CGT_type *cgt)
         for(jgroup = 0; jgroup < pc->groups; jgroup++)
         {
             if(cgt->counts[ihash*pc->hashtest+jgroup][0] > thresh){
-                for(i = 0; i < cgt->lgn; i++){
+                for(i = 0; i < cgt->logn; i++){
                     LogMessage("%d|",cgt->counts[ihash*pc->hashtest+jgroup][i]);
                 }
                 LogMessage("/n");
