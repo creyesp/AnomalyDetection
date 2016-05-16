@@ -404,9 +404,11 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               }
               if (pass==1)
                 { 
-                  // if the item passes all the tests, then output it
+                  // if the item passes all the tests, then output i
+                  printf("salida del guess\n");
                   printf("%u - %u - %u | ",guess[0],guess[1],guess[2]);
                   results[hits]=guess;
+                  printf("salida de resuls  \n");
                   printf("%u - %u - %u | ",results[hits][0], results[hits][1], results[hits][2]);
                   hits++;
                 }
@@ -449,6 +451,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       for (i=0;i < hits;i++)
         { 
           compresults[i+1]=results[i];
+          printf("resultado: %u %u\n",results[i][0], compresults[i][0] );
         } 
     }
   else
