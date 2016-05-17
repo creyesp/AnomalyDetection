@@ -35,15 +35,16 @@ void shell(unsigned long n, unsigned int a[])
 int comp96(const void *a, const void *b)
 {
   size_t n;
-  const unsigned int *a_ptr = a;
-  const unsigned int *b_ptr = b;
+  unsigned int **a_ptr = (unsigned int **)a;
+  unsigned int **b_ptr = (unsigned int **)b;
+  // printf("%d %d\n",*((unsigned int*)*a_ptr),*((unsigned int*)*b_ptr));
+  printf("%d %d\n",a_ptr[0][0],b_ptr[0][0]);
 
-  for (n = 0; n != 3; ++n) 
-  {
-    if (b_ptr[n] > a_ptr[n]) {
+  for (n = 0; n != 6; ++n) {
+    if (b_ptr[0][n] > a_ptr[0][n]) {
       return 1;
     }
-    if (a_ptr[n] > b_ptr[n]) {
+    if (a_ptr[0][n] > b_ptr[0][n]) {
       return -1;
       
     }
@@ -453,6 +454,10 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       // sort the output
 
       qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp96);
+
+      for(i = 0; i < cgt->tests*cgt->buckets; i++)
+        LogMessage("%u - %u - %u \n",results[i][0],results[i][1],results[i][2]);
+
       for (i=0;i<hits;i++)
         { 
           if (results[i][0]!=last[0] || results[i][1]!=last[1] || results[i][2]!=last[2])
