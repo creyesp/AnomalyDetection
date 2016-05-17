@@ -440,9 +440,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                   results[hits][0] = guess[0];
                   results[hits][1] = guess[1];
                   results[hits][2] = guess[2];
-                  LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
-                  LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
+                  // LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  // LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
+                  // LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
                   hits++;
                 }
             }
@@ -454,10 +454,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       // sort the output
 
       qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp96);
-
-      for(i = 0; i < cgt->tests*cgt->buckets; i++)
-        LogMessage("%u - %u - %u \n",results[i][0],results[i][1],results[i][2]);
-
       for (i=0;i<hits;i++)
         { 
           if (results[i][0]!=last[0] || results[i][1]!=last[1] || results[i][2]!=last[2])
@@ -466,9 +462,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               last[0]=results[i][0];
               last[1]=results[i][1];
               last[2]=results[i][2];
-              LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
-              LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
-              LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
+              // LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
+              // LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
+              // LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
             }
         }
         LogMessage("claimed %i",claimed);
@@ -491,9 +487,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               last[0]=results[i][0];
               last[1]=results[i][1];
               last[2]=results[i][2];
-              LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
-              LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
-              LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
+              // LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              // LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              // LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
               claimed++;
 
             }
