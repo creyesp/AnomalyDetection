@@ -575,8 +575,8 @@ void VGT_Update96(VGT_type *vgt, unsigned int srcip, unsigned int dstip, unsigne
   vgt->count+=diff; //count all item
   for (i=0;i<vgt->tests;i++) 
     {
-      hash1 = hash31(vgt->testa[i],vgt->testb[i],dstip);
-      hash2 = hash31(vgt->testa[i],vgt->testb[i],srcip);
+      hash1 = hash31(vgt->testa[i],vgt->testb[i],srcip);
+      hash2 = hash31(vgt->testa[i],vgt->testb[i],dstip);
       hash3 = hash31(vgt->testa[i],vgt->testb[i],ports);
       hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
       hash = hash % (vgt->buckets); 
