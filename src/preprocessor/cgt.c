@@ -189,24 +189,21 @@ int testCGT96(unsigned int *rtest, int *count, int nbit, int thresh)
       output += bit; 
       if(c == 32){
         result[0] = output;
-        LogMessage("%d\n",output);
         output = 0;
       }
       if(c == 64){
         result[1] = output;
-        LogMessage("%d\n",output);
         output = 0  ;      
       }
     }
     result[2] = output;
-    LogMessage("%d\n",output);
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
 
     LogMessage("Test: %u - %u - %u \n", rtest[0], rtest[1], rtest[2]);
-    LogMessage("Test: %u.%u.%u.%u -", result[0]&0x000000ff,(result[0]&0x0000ff00)>>8,(result[0]&0x00ff0000)>>16,(result[0]&0xff000000)>>24);
-    LogMessage("%u.%u.%u.%u -", result[1]&0x000000ff,(result[1]&0x0000ff00)>>8,(result[1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
+    LogMessage("Test: %u.%u.%u.%u - ", result[0]&0x000000ff,(result[0]&0x0000ff00)>>8,(result[0]&0x00ff0000)>>16,(result[0]&0xff000000)>>24);
+    LogMessage("%u.%u.%u.%u - ", result[1]&0x000000ff,(result[1]&0x0000ff00)>>8,(result[1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
     LogMessage("%u - %u \n", (result[2]&0xffff0000)>>16,result[2]&0x0000ffff);
   }
   else
@@ -392,6 +389,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash3 = hash31(cgt->testa[i],cgt->testb[i],guess[2]);
               hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
               hash = hash % cgt->buckets; 
+              LogMessage("hash: %u j: %u", hash, j)
             }
           if ((outputGuess == 0) && (hash == j))
             {
@@ -404,8 +402,10 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                   hash3 = hash31(cgt->testa[k],cgt->testb[k],guess[2]);
                   hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
                   hash=(cgt->buckets*k) + (hash % (cgt->buckets));
-                  if (cgt->counts[hash][0]<thresh)
+                  if (cgt->counts[hash][0]<thresh){
                     pass=0;
+                    LogMessage("k: %u",k);
+                  }
                 }
               for( k = 0; k < vgt->tests; k++ ) 
               {
@@ -469,7 +469,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       for (i=0;i < hits;i++)
         { 
           compresults[i+1]=results[i];
-          printf("resultado: %u %u\n",results[i][0], compresults[i][0] );
         } 
     }
   else

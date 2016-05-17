@@ -434,7 +434,7 @@ static void PreprocFunction(Packet *p,void *context)
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
             }else
-                LogMessage("es NULL\n");
+                LogMessage("Salida en preoprocfuntion es NULL\n");
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
             //CGT_Destroy(cgt_aux);
