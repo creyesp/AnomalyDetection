@@ -409,14 +409,16 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                 }
               for( k = 0; k < vgt->tests; k++ ) 
               {
-                hash1 = hash31(cgt->testa[k],cgt->testb[k],guess[0]);
-                hash2 = hash31(cgt->testa[k],cgt->testb[k],guess[1]);
-                hash3 = hash31(cgt->testa[k],cgt->testb[k],guess[2]);
+                hash1 = hash31(vgt->testa[k],vgt->testb[k],guess[0]);
+                hash2 = hash31(vgt->testa[k],vgt->testb[k],guess[1]);
+                hash3 = hash31(vgt->testa[k],vgt->testb[k],guess[2]);
                 hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
                 hash = (vgt->buckets*k) + (hash % (vgt->buckets));
                 if (vgt->counts[hash] < thresh)
                 {
                   pass = 0;
+                  LogMessage("VGT: %u\n",pass);
+
                 }
                 
               }
