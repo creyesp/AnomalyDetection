@@ -200,11 +200,6 @@ int testCGT96(unsigned int rtest[3], int *count, int nbit, int thresh)
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
-
-    LogMessage("Test: %u - %u - %u \n", rtest[0], rtest[1], rtest[2]);
-    LogMessage("Test: %u.%u.%u.%u - ", result[0]&0x000000ff,(result[0]&0x0000ff00)>>8,(result[0]&0x00ff0000)>>16,(result[0]&0xff000000)>>24);
-    LogMessage("%u.%u.%u.%u - ", result[1]&0x000000ff,(result[1]&0x0000ff00)>>8,(result[1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
-    LogMessage("%u - %u \n", (result[2]&0xffff0000)>>16,result[2]&0x0000ffff);
   }
   else
     return 1;
@@ -389,7 +384,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               hash3 = hash31(cgt->testa[i],cgt->testb[i],guess[2]);
               hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
               hash = hash % cgt->buckets; 
-              LogMessage("hash: %u j: %u\n", hash, j);
             }
           if ((outputGuess == 0) && (hash == j))
             {
@@ -425,11 +419,10 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output i
-                  LogMessage("salida del guess\n");
-                  LogMessage("%u - %u - %u \n",guess[0],guess[1],guess[2]);
                   results[hits]=guess;
-                  LogMessage("salida de resuls  \n");
-                  LogMessage("%u - %u - %u \n",results[hits][0], results[hits][1], results[hits][2]);
+                  LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
+                  LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
                   hits++;
                 }
             }
@@ -467,15 +460,22 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
         compresults[i] = calloc(3,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
       }  
+      LogMessage("hits: %u",hits);
       compresults[0][0]=hits;    
+      LogMessage("hits: %u",compresults[0][0]);
       for (i=0;i < hits;i++)
         { 
-          compresults[i+1]=results[i];
+          compresults[i+1][0]=results[i][0];
+          compresults[i+1][1]=results[i][1];
+          compresults[i+1][2]=results[i][2];
         } 
     }
   else
     {
-      compresults = NULL;
+      for(i = 0; i < cgt->tests*cgt->buckets; i++)
+        free(results[i]);
+      free(results);
+      return NULL;
     }
   for(i = 0; i < cgt->tests*cgt->buckets; i++)
     free(results[i]);
