@@ -352,7 +352,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   int i=0,j=0,k=0, outputGuess;
   unsigned int guess[3];
   unsigned int **results, **compresults;
-  unsigned long hits =0;
+  unsigned int hits =0;
   int last=-1;  
   int claimed=0;  
   int testval=0;
@@ -421,7 +421,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                   // if the item passes all the tests, then output i
                   results[hits]=guess;
                   LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(result[1]&0xff000000)>>24);
+                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
                   LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
                   hits++;
                 }
