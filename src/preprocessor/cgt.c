@@ -462,12 +462,13 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       }  
       LogMessage("hits: %u",hits);
       compresults[0][0]=hits;    
-      LogMessage("hits: %u",compresults[0][0]);
+      LogMessage("hits: %u\n",compresults[0][0]);
       for (i=0;i < hits;i++)
         { 
           compresults[i+1][0]=results[i][0];
           compresults[i+1][1]=results[i][1];
           compresults[i+1][2]=results[i][2];
+          LogMessage("cp %d:  %u\n",i,compresults[i+1][0]);
         } 
     }
   else
@@ -475,11 +476,13 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       for(i = 0; i < cgt->tests*cgt->buckets; i++)
         free(results[i]);
       free(results);
+      LogMessage("FREE results NULL");
       return NULL;
     }
   for(i = 0; i < cgt->tests*cgt->buckets; i++)
     free(results[i]);
   free(results);
+  LogMessage("FREE results");
   return(compresults);
 }  
 

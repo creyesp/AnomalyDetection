@@ -433,6 +433,9 @@ static void PreprocFunction(Packet *p,void *context)
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
+                else{
+                    LogMessage("NULL en outputList");
+                }
             }else
                 LogMessage("Salida en preoprocfuntion es NULL\n");
             //cgt_aux = cgt_old;
