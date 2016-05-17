@@ -422,19 +422,18 @@ static void PreprocFunction(Packet *p,void *context)
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
      
-            LogMessage("AnomalyDetection log time:  %s",ctime(&LastLogTime));
-            LogMessage("\nPaquetes capturados por SNORT: %d\n",countpaket);
+            LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
+            LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             if(outputList != NULL){
-                LogMessage("Numero de salidas: %d",outputList[0][0]);
+                LogMessage("Numero de salidas: %d\n",outputList[0][0]);
                 for(i=1; i <= outputList[0][0]; i++)
                 {
                     LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
-            }else
-                LogMessage("Salida en preoprocfuntion es NULL\n");
+            }
             //cgt_aux = cgt_old;
             //cgt_old = cgt;
             //CGT_Destroy(cgt_aux);

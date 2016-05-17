@@ -18,18 +18,37 @@ void shell(unsigned long n, unsigned int a[])
   } while (inc <= n);
   do { 
     inc /= 3;
-    for (i=inc;i<=n;i++) { 
-      v=a[i];
-      j=i;
-      while (a[j-inc] > v) {
-  a[j]=a[j-inc];
-  j -= inc;
-  if (j < inc) break;
+    for ( i = inc; i <= n; i++ ) { 
+      v = a[i];
+      j = i;
+      while ( a[j-inc] > v) {
+        a[j] = a[j-inc];
+        j -= inc;
+        if (j < inc) break;
       }
-      a[j]=v;
+      a[j] = v;
     }
   } while (inc > 1);
 }
+
+/*    sort array 2d     */
+int comp96(const void *a, const void *b)
+{
+  size_t n;
+  const unsigned int *a_ptr = a;
+  const unsigned int *b_ptr = b;
+
+  for (n = 0; n != 3; ++n) {
+    if (b_ptr[n] > a_ptr[n]) {
+      return 1;
+    }
+    if (a_ptr[n] > b_ptr[n]) {
+      return -1;
+      
+    }
+  }
+}
+
 
 void loginsert(int *lists, unsigned int val, int length, int diff) 
 {
@@ -353,7 +372,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   unsigned int guess[3];
   unsigned int **results, **compresults;
   unsigned int hits =0;
-  int last=-1;  
+  unsigned int last[3];  
   int claimed=0;  
   int testval=0;
   int pass = 0;
@@ -397,9 +416,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                   hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
                   hash=(cgt->buckets*k) + (hash % (cgt->buckets));
                   if (cgt->counts[hash][0]<thresh){
-                    pass=0;
-                    LogMessage("k: %u\n",k);
-                  }
+                    pass=0;                  }
                 }
               for( k = 0; k < vgt->tests; k++ ) 
               {
@@ -411,20 +428,18 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                 if (vgt->counts[hash] < thresh)
                 {
                   pass = 0;
-                  LogMessage("VGT: %u\n",pass);
-
                 }
                 
               }
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output i
-                  results[hits][0]=guess[0];
-                  results[hits][1]=guess[1];
-                  results[hits][2]=guess[2];
-                  LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
-                  LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
+                  results[hits][0] = guess[0];
+                  results[hits][1] = guess[1];
+                  results[hits][2] = guess[2];
+                  // LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  // LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
+                  // LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
                   hits++;
                 }
             }
@@ -434,65 +449,54 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   if (hits>0)
     {
       // sort the output
-      // shell(hits-1,results);
-      // last=0; claimed=0;
-      // for (i=0;i<hits;i++)
-      //   { 
-      //     if (results[i]!=last)
-      //       {   // For each distinct item in the output...
-      //         claimed++;
-      //         last=results[i];
-      //       }
-      //   }
-      // compresults=(unsigned int *) calloc(claimed+1,sizeof(unsigned int));
-      // compresults[0]=claimed;
-      // claimed=1; last=0;
-
-      // for (i=0;i<hits;i++)
-      //   { 
-      //     if (results[i]!=last)
-      //       {   // For each distinct item in the output...
-      //         compresults[claimed++]=results[i];
-      //         last=results[i];
-      //       }
-      //   } 
-      compresults = calloc(hits+1,sizeof(unsigned int *));
+      qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp96);
+      last={0,0,0}; 
+      claimed=0;
+      for (i=0;i<hits;i++)
+        { 
+          if (results[i][0]!=last[0] && results[i][1]!=last[1] && results[i][2]!=last[2])
+            {   // For each distinct item in the output...
+              claimed++;
+              last[0]=results[i][0];
+              last[1]=results[i][1];
+              last[2]=results[i][2];
+            }
+        }
+      compresults = calloc(claimed+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
-      for(i = 0; i <= hits; i++){
+      for(i = 0; i <= claimed; i++){
         compresults[i] = calloc(3,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
-      }  
-      LogMessage("hits: %u",hits);
-      compresults[0][0]=hits;    
-      LogMessage("hits: %u\n",compresults[0][0]);
-      for (i=0;i < hits;i++)
+      } 
+      compresults[0][0]=claimed;
+      claimed=1; last=0;
+
+      for (i=0;i<hits;i++)
         { 
-          compresults[i+1][0]=results[i][0];
-          compresults[i+1][1]=results[i][1];
-          compresults[i+1][2]=results[i][2];
-          LogMessage("cp %d:  %u\n",i,compresults[i+1][0]);
-        } 
-      LogMessage("---- %d \n",i);
-    }
+          if (results[i][0]!=last[0] && results[i][1]!=last[1] && results[i][2]!=last[2])
+            {   // For each distinct item in the output...
+              compresults[claimed][0]=results[i][0];
+              compresults[claimed][1]=results[i][1];
+              compresults[claimed][2]=results[i][2];
+              last[0]=results[i][0];
+              last[1]=results[i][1];
+              last[2]=results[i][2];
+              claimed++;
+            }
+        }
+    } 
   else
     {
       for(i = 0; i < cgt->tests*cgt->buckets; i++){
         free(results[i]);
-        LogMessage("%d ",i);
       }
-      LogMessage("\n");
       free(results);
-      LogMessage("FREE results NULL");
       return NULL;
     }
   for(i = 0; i < cgt->tests*cgt->buckets; i++){
-    LogMessage("%d ",i);
     free(results[i]);
-    LogMessage("%d ",i);
   }
-  LogMessage("\n");
   free(results);
-  LogMessage("FREE results");
   return(compresults);
 }  
 
