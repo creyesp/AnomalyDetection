@@ -467,7 +467,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               // LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
             }
         }
-        LogMessage("claimed %i",claimed);
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
       for(i = 0; i <= claimed; i++){
