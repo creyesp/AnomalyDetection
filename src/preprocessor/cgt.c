@@ -38,7 +38,8 @@ int comp96(const void *a, const void *b)
   const unsigned int *a_ptr = a;
   const unsigned int *b_ptr = b;
 
-  for (n = 0; n != 3; ++n) {
+  for (n = 0; n != 3; ++n) 
+  {
     if (b_ptr[n] > a_ptr[n]) {
       return 1;
     }
@@ -47,6 +48,7 @@ int comp96(const void *a, const void *b)
       
     }
   }
+  return 0;
 }
 
 
@@ -369,7 +371,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   // Find the hot items by doing the group testing
 
   int i=0,j=0,k=0, outputGuess;
-  unsigned int guess[3];
+  unsigned int guess[3]={0,0,0};
   unsigned int **results, **compresults;
   unsigned int hits =0;
   unsigned int last[3];  
@@ -450,8 +452,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
     {
       // sort the output
       qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp96);
-      last={0,0,0}; 
-      claimed=0;
       for (i=0;i<hits;i++)
         { 
           if (results[i][0]!=last[0] && results[i][1]!=last[1] && results[i][2]!=last[2])
@@ -469,7 +469,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
         if(compresults[i] == NULL) exit(1);
       } 
       compresults[0][0]=claimed;
-      claimed=1; last=0;
+      claimed=1; last[0]=0; last[1]=0; last[2]=0;
 
       for (i=0;i<hits;i++)
         { 
