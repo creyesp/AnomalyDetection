@@ -419,7 +419,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output i
-                  results[hits]=guess;
+                  results[hits][0]=guess[0];
+                  results[hits][1]=guess[1];
+                  results[hits][2]=guess[2];
                   LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
                   LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
                   LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
@@ -470,7 +472,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
           compresults[i+1][2]=results[i][2];
           LogMessage("cp %d:  %u\n",i,compresults[i+1][0]);
         } 
-      LogMessage("---- %d \n",i)
+      LogMessage("---- %d \n",i);
     }
   else
     {
@@ -483,13 +485,14 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       LogMessage("FREE results NULL");
       return NULL;
     }
-      for(i = 0; i < cgt->tests*cgt->buckets; i++){
-        free(results[i]);
-        LogMessage("%d ",i);
-      }
-      LogMessage("\n");
-      free(results);
-      LogMessage("FREE results");
+  for(i = 0; i < cgt->tests*cgt->buckets; i++){
+    LogMessage("%d ",i);
+    free(results[i]);
+    LogMessage("%d ",i);
+  }
+  LogMessage("\n");
+  free(results);
+  LogMessage("FREE results");
   return(compresults);
 }  
 
