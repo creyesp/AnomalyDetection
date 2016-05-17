@@ -455,7 +455,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
       qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp96);
       for (i=0;i<hits;i++)
         { 
-          if (results[i][0]!=last[0] && results[i][1]!=last[1] && results[i][2]!=last[2])
+          if (results[i][0]!=last[0] || results[i][1]!=last[1] || results[i][2]!=last[2])
             {   // For each distinct item in the output...
               claimed++;
               last[0]=results[i][0];
@@ -466,7 +466,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
               LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
             }
         }
-        LogMessage("claimed %i",claimed)
+        LogMessage("claimed %i",claimed);
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
       for(i = 0; i <= claimed; i++){
