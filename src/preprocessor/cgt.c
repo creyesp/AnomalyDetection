@@ -38,8 +38,6 @@ int comp96(const void *a, const void *b)
   unsigned int **a_ptr = (unsigned int **)a;
   unsigned int **b_ptr = (unsigned int **)b;
   // printf("%d %d\n",*((unsigned int*)*a_ptr),*((unsigned int*)*b_ptr));
-  printf("%d %d\n",a_ptr[0][0],b_ptr[0][0]);
-
   for (n = 0; n != 6; ++n) {
     if (b_ptr[0][n] > a_ptr[0][n]) {
       return 1;
