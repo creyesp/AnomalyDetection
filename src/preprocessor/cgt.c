@@ -149,7 +149,7 @@ CGT_type * CGT_Init(int buckets, int tests, int lgn)
 }
 
 //Funcion test, toma el umbral y hace las verificaciones
-unsigned int testCGT(int *count, int nbit, long long thresh)
+unsigned int testCGT(long long *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -181,7 +181,7 @@ unsigned int testCGT(int *count, int nbit, long long thresh)
 }
 
 //unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
-int testCGT96(unsigned int rtest[3], int *count, int nbit, long long thresh)
+int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
