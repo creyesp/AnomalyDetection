@@ -375,20 +375,17 @@ static long long ComputeDiffThresh(CGT_type *cgt)
 
     int ihash, jgroup;
     long long count[pc->hashtest], thresh;
-    LogMessage("ComputeDiffThresh init");
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
         for(jgroup = 0; jgroup < pc->groups; jgroup++)
-        {   LogMessage("%lld",count[ihash]);
+        {   
             count[ihash] += abs(cgt->counts[ihash*pc->hashtest+jgroup][0]);
         }
     }
-    LogMessage("ComputeDiffThresh middel");
-
     qsort(count, pc->hashtest, sizeof(long long), compare);
     thresh =  (long long)(pc->phi*count[(int)pc->hashtest/2]);
-    LogMessage("#packet CGT.count: %lld | Thresh DIFF: %lld \n",cgt->count, thresh);
+    LogMessage("#packet CGT.count: %lld | Thresh DIFF: %lld \n",count[(int)pc->hashtest/2], thresh);
     return thresh;
 }
 
@@ -454,19 +451,19 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             if(outputList != NULL){
-                LogMessage("Numero de salidas: %d\n",outputList[0][0]);
-                for(i=1; i <= outputList[0][0]; i++)
+                LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
+                for(i=1; i < outputList[0][0]; i++)
                 {
                     LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
             }
-            LogMessage("***************************************************\n")
+            LogMessage("***************************************************\n");
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
             if(outputDiffList != NULL){
-                LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]);
-                for(i=1; i <= outputDiffList[0][0]; i++)
+                LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
+                for(i=1; i < outputDiffList[0][0]; i++)
                 {
                     LogMessage("CANDIDATO DIFF==> ipsrc %u.%u.%u.%u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);

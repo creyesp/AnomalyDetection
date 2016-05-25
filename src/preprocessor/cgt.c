@@ -307,14 +307,14 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   // check every hash of that item is above threshold... 
                   hash=hash31(cgt->testa[k],cgt->testb[k],guess);
                   hash=(cgt->buckets*k) + (hash % (cgt->buckets));
-                  if (cgt->counts[hash][0]<thresh)
+                  if (abs(cgt->counts[hash][0])<thresh)
                     pass=0;
                 }
               for( k = 0; k < vgt->tests; k++ ) 
               {
                 hash = hash31(vgt->testa[k],vgt->testb[k],guess);
                 hash = (vgt->buckets*k) + (hash % (vgt->buckets));
-                if (vgt->counts[hash] < thresh)
+                if (abs(vgt->counts[hash]) < thresh)
                 {
                   pass = 0;
                 }
@@ -416,7 +416,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   hash3 = hash31(cgt->testa[k],cgt->testb[k],guess[2]);
                   hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
                   hash=(cgt->buckets*k) + (hash % (cgt->buckets));
-                  if (cgt->counts[hash][0]<thresh){
+                  if (abs(cgt->counts[hash][0]) < thresh){
                     pass=0;                  }
                 }
               for( k = 0; k < vgt->tests; k++ ) 
@@ -438,9 +438,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][0] = guess[0];
                   results[hits][1] = guess[1];
                   results[hits][2] = guess[2];
-                  // LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  // LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
-                  // LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
+                  LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
+                  LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
                   hits++;
                 }
             }
@@ -484,9 +484,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last[0]=results[i][0];
               last[1]=results[i][1];
               last[2]=results[i][2];
-              // LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
-              // LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
-              // LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
+              LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
               claimed++;
 
             }
