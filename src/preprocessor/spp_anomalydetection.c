@@ -345,38 +345,13 @@ static int compare(const void * a, const void * b)
  *
  * Returns: 
  */
-static int ComputeThresh(CGT_type *cgt)
+static long long ComputeThresh(CGT_type *cgt)
 {
     tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
 
-    int ihash, jgroup, thresh;
-    float count[pc->hashtest];
-
-    for(ihash = 0; ihash < pc->hashtest; ihash++)
-    {
-        count[ihash] = 0;
-        for(jgroup = 0; jgroup < pc->groups; jgroup++)
-        {
-            count[ihash] += cgt->counts[ihash*pc->hashtest+jgroup][0];
-        }
-    }
-
-    qsort(count, pc->hashtest, sizeof(float), compare);
-    thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
-    LogMessage("#packet CGT.count: %lld | Thresh: %d \n",cgt->count, thresh);
-    return thresh;
-}
-
-static int ComputeDiffThresh(CGT_type *cgt)
-{
-    tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
-    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-
-    int ihash, jgroup, thresh;
-    float count[pc->hashtest];
-
-    int i;
+    int ihash, jgroup;
+    long long count[pc->hashtest], thresh;
 
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
@@ -387,9 +362,32 @@ static int ComputeDiffThresh(CGT_type *cgt)
         }
     }
 
-    qsort(count, pc->hashtest, sizeof(float), compare);
-    thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
-    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
+    qsort(count, pc->hashtest, sizeof(long long), compare);
+    thresh =  (long long)(pc->phi*count[(int)pc->hashtest/2]);
+    LogMessage("#packet CGT.count: %lld | Thresh: %lld \n",cgt->count, thresh);
+    return thresh;
+}
+
+static long long ComputeDiffThresh(CGT_type *cgt)
+{
+    tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
+
+    int ihash, jgroup;
+    long long count[pc->hashtest], thresh;
+
+    for(ihash = 0; ihash < pc->hashtest; ihash++)
+    {
+        count[ihash] = 0;
+        for(jgroup = 0; jgroup < pc->groups; jgroup++)
+        {
+            count[ihash] += abs(cgt->counts[ihash*pc->hashtest+jgroup][0]);
+        }
+    }
+
+    qsort(count, pc->hashtest, sizeof(long long), compare);
+    thresh =  (long long)(pc->phi*count[(int)pc->hashtest/2]);
+    LogMessage("#packet CGT.count: %lld | Thresh DIFF: %lld \n",cgt->count, thresh);
     return thresh;
 }
 

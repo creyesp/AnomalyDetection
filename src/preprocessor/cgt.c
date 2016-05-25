@@ -51,7 +51,7 @@ int comp96(const void *a, const void *b)
 }
 
 
-void loginsert(int *lists, unsigned int val, int length, int diff) 
+void loginsert(long long *lists, unsigned int val, int length, int diff) 
 {
   // add on a value of diff to the counts for item val
   int i;
@@ -68,7 +68,7 @@ void loginsert(int *lists, unsigned int val, int length, int diff)
   }
 }
 
-void loginsert96(int *lists, unsigned int val1, unsigned int val2, unsigned int val3, int length, int diff) 
+void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigned int val3, int length, int diff) 
 {
   // add on a value of diff to the counts for item val
   int i;
@@ -149,7 +149,7 @@ CGT_type * CGT_Init(int buckets, int tests, int lgn)
 }
 
 //Funcion test, toma el umbral y hace las verificaciones
-unsigned int testCGT(int *count, int nbit, int thresh)
+unsigned int testCGT(int *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -163,8 +163,8 @@ unsigned int testCGT(int *count, int nbit, int thresh)
   {
     for(c=1; c<=nbit ;c++)
     {
-      tc = count[0]-count[c]; //test complemento
-      t = count[c]; //test
+      tc = abs(count[0])-abs(count[c]); //test complemento
+      t = abs(count[c]); //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
         return 0;
       if( t >= thresh ) // the third test
@@ -181,7 +181,7 @@ unsigned int testCGT(int *count, int nbit, int thresh)
 }
 
 //unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
-int testCGT96(unsigned int rtest[3], int *count, int nbit, int thresh)
+int testCGT96(unsigned int rtest[3], int *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -197,7 +197,7 @@ int testCGT96(unsigned int rtest[3], int *count, int nbit, int thresh)
     for(c=1; c<=nbit ;c++)
     {
       tc = abs(count[0])-abs(count[c]); //test complemento
-      t = count[c]; //test
+      t = abs(count[c]); //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
         //return NULL;
         return 1;
@@ -267,7 +267,7 @@ void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip, unsigne
     }
 }
 
-unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, int thresh)
+unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
 {
   // Find the hot items by doing the group testing
 
@@ -365,7 +365,7 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, int thresh)
   return(compresults);
 }  
 
-unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
+unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
 {
   // Find the hot items by doing the group testing
 
