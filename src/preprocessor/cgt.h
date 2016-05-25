@@ -7,17 +7,17 @@ typedef struct CGT_type{
   int logn;
   int buckets;
   int subbuckets;
-  int count;
-  int ** counts;
-  int *testa, *testb;
+  long long count;
+  long long ** counts;
+  long long *testa, *testb;
 } CGT_type;
 
 typedef struct VGT_type{
   int tests;
   int buckets;
-  int count;
-  int * counts;
-  int *testa, *testb;
+  long long count;
+  long long * counts;
+  long long  *testa, *testb;
 } VGT_type;
 
 extern CGT_type * CGT_Init(int, int, int);

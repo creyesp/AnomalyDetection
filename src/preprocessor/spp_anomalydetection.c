@@ -32,7 +32,7 @@
 
 
 CGT_type *cgt, *cgt_old;
-VGT_type *vgt;
+VGT_type *vgt, *vgt_old;
 
 FILE *fptr,*file2, *dataflow;
 time_t LastLogTime, CurrentTime;
@@ -154,7 +154,10 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     ParseAnomalyDetectionArgs(ad_Config, args);
     /* Inicializa los grupos para almacenar sketches*/
     cgt = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    cgt_old = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
     vgt = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+    vgt_old = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+
 
     /* Agrega el preprocesar a una lista con prioridades al momento de acceder al dato bruto */
     AddFuncToPreprocList( sc, PreprocFunction, PRIORITY_SCANNER,  PP_SFPORTSCAN, PROTO_BIT__ALL);
@@ -285,8 +288,10 @@ static void addCGT(Packet *p)
             srcport = (unsigned short int)p->sp;
             dstport = (unsigned short int)p->dp;
             packetsize = 1;
-            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize); 
+            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize);
+            CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
             VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
+            VGT_Update96(vgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
         }
     }
        
@@ -365,6 +370,31 @@ static int ComputeThresh(CGT_type *cgt)
     return thresh;
 }
 
+static int ComputeDiffThresh(CGT_type *cgt)
+{
+    tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
+    AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
+
+    int ihash, jgroup, thresh;
+    float count[pc->hashtest];
+
+    int i;
+
+    for(ihash = 0; ihash < pc->hashtest; ihash++)
+    {
+        count[ihash] = 0;
+        for(jgroup = 0; jgroup < pc->groups; jgroup++)
+        {
+            count[ihash] += abs(cgt->counts[ihash*pc->hashtest+jgroup][0]);
+        }
+    }
+
+    qsort(count, pc->hashtest, sizeof(float), compare);
+    thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
+    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
+    return thresh;
+}
+
 static time_t increaseTime(time_t timec, int delta){
     struct tm* tm = localtime(&timec);
     tm->tm_sec += delta;
@@ -385,9 +415,10 @@ static void PreprocFunction(Packet *p,void *context)
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int ** outputList;
+    unsigned int ** outputDiffList;
     double TimeInterval;
 
-    int i;
+    int i,nlist,ndifflist;
 
     if(flag==0) //check if it is new file, all new log files need to have header
     {
@@ -434,13 +465,37 @@ static void PreprocFunction(Packet *p,void *context)
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
             }
-            //cgt_aux = cgt_old;
-            //cgt_old = cgt;
-            //CGT_Destroy(cgt_aux);
-            CGT_Destroy(cgt);
-            VGT_Destroy(vgt);
+
+            outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
+            if(outputDiffList != NULL){
+                LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]);
+                for(i=1; i <= outputDiffList[0][0]; i++)
+                {
+                    LogMessage("CANDIDATO DIFF==> ipsrc %u.%u.%u.%u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
+                    LogMessage(" ipdst %u.%u.%u.%u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
+                    LogMessage(" portSrc %u portDst %u \n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16));
+                }
+            }
+
+            CGT_Destroy(cgt_old);
+            VGT_Destroy(vgt_old);
+            cgt_old = cgt;
+            vgt_old = vgt;
             cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt = VGT_Init(pc->groups,pc->hashtest);
+
+            ndifflist = outputDiffList[0][0];
+            nlist = outputList[0][0];
+            for(i = 0; i < cgt-> nlist; i++){
+                free(outputList[i]);
+            }
+            free(outputList);
+            
+            for(i = 0; i < cgt-> ndifflist; i++){
+                free(outputDiffList[i]);
+            }
+            free(outputDiffList);
+
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts

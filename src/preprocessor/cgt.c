@@ -123,12 +123,12 @@ CGT_type * CGT_Init(int buckets, int tests, int lgn)
   result->testb=calloc(tests,sizeof(long long));
   // create space for the hash functions
 
-  result->counts=calloc(buckets*tests,sizeof(int *));
+  result->counts=calloc(buckets*tests,sizeof(long long *));
   if (result->counts==NULL) exit(1); 
   // create space for the counts
   for (i=0;i<buckets*tests;i++)
     {
-      result->counts[i]=calloc(result->subbuckets,sizeof(int));
+      result->counts[i]=calloc(result->subbuckets,sizeof(long long));
       if (result->counts[i]==NULL) exit(1); 
     }
   for (i=0;i<tests;i++)
@@ -196,7 +196,7 @@ int testCGT96(unsigned int rtest[3], int *count, int nbit, int thresh)
   {
     for(c=1; c<=nbit ;c++)
     {
-      tc = count[0]-count[c]; //test complemento
+      tc = abs(count[0])-abs(count[c]); //test complemento
       t = count[c]; //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
         //return NULL;
@@ -426,7 +426,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
                 hash3 = hash31(vgt->testa[k],vgt->testb[k],guess[2]);
                 hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);
                 hash = (vgt->buckets*k) + (hash % (vgt->buckets));
-                if (vgt->counts[hash] < thresh)
+                if (abs(vgt->counts[hash]) < thresh)
                 {
                   pass = 0;
                 }
@@ -471,7 +471,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
         compresults[i] = calloc(3,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
       } 
-      compresults[0][0]=claimed;
+
       claimed=1; last[0]=0; last[1]=0; last[2]=0;
 
       for (i=0;i<hits;i++)
@@ -491,6 +491,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
 
             }
         }
+        compresults[0][0]=claimed;  
     } 
   else
     {
@@ -506,14 +507,6 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, int thresh)
   free(results);
   return(compresults);
 }  
-
-int CGT_Size(CGT_type *cgt)
-{
-  int size;
-  size=2*cgt->tests*sizeof (long long) + 
-    cgt->buckets*cgt->tests*(cgt->subbuckets*sizeof(int))+sizeof(CGT_type);
-  return(size);
-}
 
 void CGT_Destroy(CGT_type * cgt)
 {
@@ -551,7 +544,7 @@ VGT_type * VGT_Init(int buckets, int tests)
   verification->count = 0;
   verification->testa = calloc(verification->tests,sizeof(long long));
   verification->testb = calloc(verification->tests,sizeof(long long));
-  verification->counts = calloc(verification->buckets*verification->tests,sizeof(int));
+  verification->counts = calloc(verification->buckets*verification->tests,sizeof(long long));
   if(verification->counts == NULL) exit(1);
 
   for( i = 0; i < verification->tests; i++)
