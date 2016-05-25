@@ -159,9 +159,9 @@ unsigned int testCGT(long long *count, int nbit, long long thresh)
   unsigned int bit;
   unsigned int output = 0;
 
-  if(count[0]>=thresh)  //the first test
+  if( abs(count[0]) >= thresh )  //the first test
   {
-    for(c=1; c<=nbit ;c++)
+    for( c = 1; c <= nbit; c++)
     {
       tc = abs(count[0])-abs(count[c]); //test complemento
       t = abs(count[c]); //test
@@ -192,11 +192,11 @@ int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thres
   unsigned int output = 0;
   unsigned int result[3];
 
-  if(count[0]>=thresh)  //the first test
+  if( abs(count[0]) >= thresh )  //the first test
   {
-    for(c=1; c<=nbit ;c++)
+    for( c = 1; c <= nbit; c++)
     {
-      tc = abs(count[0])-abs(count[c]); //test complemento
+      tc = abs(count[0]) - abs(count[c]); //test complemento
       t = abs(count[c]); //test
       if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
         //return NULL;
@@ -207,11 +207,11 @@ int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thres
         bit = 0;
       output = (output<<1);
       output += bit; 
-      if(c == 32){
+      if( c == 32){
         result[0] = output;
         output = 0;
       }
-      if(c == 64){
+      if( c == 64){
         result[1] = output;
         output = 0  ;      
       }
