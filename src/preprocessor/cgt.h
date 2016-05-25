@@ -22,9 +22,9 @@ typedef struct VGT_type{
 
 extern CGT_type * CGT_Init(int, int, int);
 extern void CGT_Update(CGT_type *, unsigned int, int); 
-extern unsigned int * CGT_Output(CGT_type *, VGT_type *, int);
+extern unsigned int * CGT_Output(CGT_type *, VGT_type *, long long);
 extern void CGT_Update96(CGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int); 
-extern unsigned int ** CGT_Output96(CGT_type *, VGT_type *, int);
+extern unsigned int ** CGT_Output96(CGT_type *, VGT_type *, long long);
 extern int CGT_Size(CGT_type *);
 extern void CGT_Destroy(CGT_type *);
 
