@@ -456,7 +456,7 @@ static void PreprocFunction(Packet *p,void *context)
                 {
                     LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                    LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
+                    LogMessage(" portSrc %u portDst %u packet %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[3]);
                 }
             }
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
@@ -466,7 +466,7 @@ static void PreprocFunction(Packet *p,void *context)
                 {
                     LogMessage("CANDIDATO DIFF==> ipsrc %u.%u.%u.%u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
                     LogMessage(" ipdst %u.%u.%u.%u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
-                    LogMessage(" portSrc %u portDst %u \n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16));
+                    LogMessage(" portSrc %u portDst %u packet %u \n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[3]);
                 }
             }
 
