@@ -353,8 +353,6 @@ static int ComputeThresh(CGT_type *cgt)
     int ihash, jgroup, thresh;
     float count[pc->hashtest];
 
-    int i;
-
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
@@ -366,7 +364,7 @@ static int ComputeThresh(CGT_type *cgt)
 
     qsort(count, pc->hashtest, sizeof(float), compare);
     thresh = (int) (pc->phi*count[(int)pc->hashtest/2]);
-    LogMessage("#packet CGT.count: %d | Thresh: %d \n",cgt->count, thresh);
+    LogMessage("#packet CGT.count: %lld | Thresh: %d \n",cgt->count, thresh);
     return thresh;
 }
 
@@ -486,12 +484,12 @@ static void PreprocFunction(Packet *p,void *context)
 
             ndifflist = outputDiffList[0][0];
             nlist = outputList[0][0];
-            for(i = 0; i < cgt-> nlist; i++){
+            for(i = 0; i < nlist; i++){
                 free(outputList[i]);
             }
             free(outputList);
             
-            for(i = 0; i < cgt-> ndifflist; i++){
+            for(i = 0; i < ndifflist; i++){
                 free(outputDiffList[i]);
             }
             free(outputDiffList);
