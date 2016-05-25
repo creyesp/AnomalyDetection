@@ -375,15 +375,16 @@ static long long ComputeDiffThresh(CGT_type *cgt)
 
     int ihash, jgroup;
     long long count[pc->hashtest], thresh;
-
+    LogMessage("ComputeDiffThresh init");
     for(ihash = 0; ihash < pc->hashtest; ihash++)
     {
         count[ihash] = 0;
         for(jgroup = 0; jgroup < pc->groups; jgroup++)
-        {
+        {   LogMessage("%lld",count[ihash]);
             count[ihash] += abs(cgt->counts[ihash*pc->hashtest+jgroup][0]);
         }
     }
+    LogMessage("ComputeDiffThresh middel");
 
     qsort(count, pc->hashtest, sizeof(long long), compare);
     thresh =  (long long)(pc->phi*count[(int)pc->hashtest/2]);
@@ -461,7 +462,7 @@ static void PreprocFunction(Packet *p,void *context)
                     LogMessage(" portSrc %u portDst %u \n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16));
                 }
             }
-
+            LogMessage("***************************************************\n")
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
             if(outputDiffList != NULL){
                 LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]);
