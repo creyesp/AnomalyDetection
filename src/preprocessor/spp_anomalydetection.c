@@ -477,19 +477,22 @@ static void PreprocFunction(Packet *p,void *context)
             vgt_old = vgt;
             cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt = VGT_Init(pc->groups,pc->hashtest);
-
-            ndifflist = outputDiffList[0][0];
-            nlist = outputList[0][0];
-            for(i = 0; i < nlist; i++){
-                free(outputList[i]);
-            }
-            free(outputList);
             
-            for(i = 0; i < ndifflist; i++){
-                free(outputDiffList[i]);
+            if(outputList != NULL){
+                nlist = outputList[0][0];
+                for(i = 0; i < nlist; i++){
+                    free(outputList[i]);
+                }
+                free(outputList);                
             }
-            free(outputDiffList);
 
+            if(outputDiffList != NULL){
+                ndifflist = outputDiffList[0][0];
+                for(i = 0; i < ndifflist; i++){
+                    free(outputDiffList[i]);
+                }
+                free(outputDiffList);
+            }
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
