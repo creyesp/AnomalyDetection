@@ -523,15 +523,19 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("COMPLETO123\n");
             outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
             outputDiffList = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+            LogMessage("DISTROY 123\n");
 
             CGT_Destroy(cgt123_old);
             VGT_Destroy(vgt123_old);
+            LogMessage("CREATE 123\n");
             cgt123_old = cgt123;
             vgt123_old = vgt123;
             cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt123 = VGT_Init(pc->groups,pc->hashtest);
+            LogMessage("DISTROY LIST 123\n");
             if(outputList != NULL) 
                 preprocFreeOutputList(outputList);
+            LogMessage("DISTROY LIST 123\n");
             if(outputDiffList != NULL) 
                 preprocFreeOutputList(outputDiffList);
 
