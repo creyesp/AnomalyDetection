@@ -448,8 +448,8 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][0] = guess[0];
                   results[hits][1] = guess[1];
                   results[hits][2] = guess[2];
-                  results[hits][3] = guess[3];
-                  results[hits][4] = cgt->counts[testval][cgt->logn+1]/guess[3];
+                  results[hits][3] = (unsigned int)cgt->counts[testval][0];
+                  results[hits][4] = (unsigned int)cgt->counts[testval][cgt->logn+1];
                   LogMessage("Salida de resuls  : %3u.%3u.%3u.%3u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
                   LogMessage("%3u.%3u.%3u.%3u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
                   LogMessage("%11d - %11d ", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
