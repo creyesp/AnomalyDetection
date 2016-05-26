@@ -222,7 +222,7 @@ int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thres
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
-    rtest[3] = count[0]
+    rtest[3] = count[0];
   }
   else{
     return 1;
@@ -235,7 +235,7 @@ int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thres
   return 0;
 }
 
-void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff)
+void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff, int dsize)
 {
   // receive an update and process the groups accordingly
 
@@ -248,7 +248,7 @@ void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff)
     {
       hash=hash31(cgt->testa[i],cgt->testb[i],newitem);
       hash=hash % (cgt->buckets); 
-      loginsert( cgt->counts[offset+hash], newitem, cgt->logn,diff );
+      loginsert( cgt->counts[offset+hash], newitem, cgt->logn,diff, dsize );
       offset+=cgt->buckets;
     }
 }
