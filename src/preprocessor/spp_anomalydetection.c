@@ -579,8 +579,8 @@ void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
     
     nlist = outputList[0][0];
-    LogMessage("nlist %d\n",,nlist);
-    for(i = 0; i < nlist; i++){
+    LogMessage("nlist %d\n",nlist);
+    for(i = 0; i < nlist; i++)
         free(outputList[i]);
     free(outputList); 
     LogMessage("Se libero\n");               
