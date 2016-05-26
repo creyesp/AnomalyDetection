@@ -93,7 +93,7 @@ void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigne
       bitmask=1;
     }
   }
-  lists[length+1] = dsize; //tamaño del paquete
+  lists[length+1] += dsize; //tamaño del paquete
 }
 /************************************************************************/
 /*                                                                      */
@@ -219,6 +219,7 @@ int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thres
       }
     }
     result[2] = output;
+
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
@@ -449,9 +450,10 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][2] = guess[2];
                   results[hits][3] = guess[3];
                   results[hits][4] = cgt->counts[testval][cgt->logn+2]/guess[3];
-                  // LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  // LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
-                  // LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
+                  LogMessage("Salida de resuls  : %3u.%3u.%3u.%3u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  LogMessage("%3u.%3u.%3u.%3u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
+                  LogMessage("%11d - %11d ", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
+                  LogMessage("%11lld - %11lld - %11lld \n", cgt->counts[testval][0], cgt->counts[testval][cgt->logn+2], cgt->counts[testval][cgt->logn+2]/guess[3]);
                   hits++;
                 }
             }

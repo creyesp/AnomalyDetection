@@ -454,9 +454,9 @@ static void PreprocFunction(Packet *p,void *context)
                 // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
                 for(i=1; i < outputList[0][0]; i++)
                 {
-                    LogMessage("CANDIDATO ==> ipsrc %u.%u.%u.%u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                    LogMessage(" ipdst %u.%u.%u.%u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                    LogMessage(" portSrc %u portDst %u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                    LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                    LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                    LogMessage(" portSrc %5u portDst %5u packet %11u size %11u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                 }
             }
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
@@ -464,9 +464,9 @@ static void PreprocFunction(Packet *p,void *context)
                 // LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
                 for(i=1; i < outputDiffList[0][0]; i++)
                 {
-                    LogMessage("CANDIDATO DIFF==> ipsrc %u.%u.%u.%u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
-                    LogMessage(" ipdst %u.%u.%u.%u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
-                    LogMessage(" portSrc %u portDst %u packet %u size %u\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3],outputDiffList[i][4]);
+                    LogMessage("CANDIDATO DIFF==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
+                    LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
+                    LogMessage(" portSrc %5u portDst %5u packet %11d size %11d\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3],outputDiffList[i][4]);
                 }
             }
 
