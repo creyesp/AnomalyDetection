@@ -461,7 +461,7 @@ static void PreprocFunction(Packet *p,void *context)
             }
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
             if(outputDiffList != NULL){
-                // LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
+                LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
                 for(i=1; i < outputDiffList[0][0]; i++)
                 {
                     LogMessage("CANDIDATO DIFF==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);

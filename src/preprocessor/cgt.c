@@ -500,9 +500,10 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last[1]=results[i][1];
               last[2]=results[i][2];
 
-              // LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
-              // LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
-              // LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
+              LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              LogMessage("%u - %u # ", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
+              LogMessage("%d - %d\n", compresults[claimed][3],compresults[claimed][4]);
               claimed++;
 
             }
