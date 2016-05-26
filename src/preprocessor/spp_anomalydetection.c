@@ -577,13 +577,13 @@ static void PreprocFunction(Packet *p,void *context)
 
 void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
-    if(outputList != NULL){
-        nlist = outputList[0][0];
-        for(i = 0; i < nlist; i++){
-            free(outputList[i]);
-        }
-        free(outputList);                
-    }
+    
+    nlist = outputList[0][0];
+    LogMessage("nlist %d\n",,nlist);
+    for(i = 0; i < nlist; i++){
+        free(outputList[i]);
+    free(outputList); 
+    LogMessage("Se libero\n");               
 }
 /* Function: SaveToLog(time_t LastLogTime)
  *
