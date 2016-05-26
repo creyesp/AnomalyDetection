@@ -70,7 +70,7 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig*, char *);
 static void PreprocFunction(Packet *, void *);
 static void SaveToLog(time_t);
 static void PrintConf_AD (const AnomalydetectionConfig*);
-void preprocFreeOutputList(unsigned int **)
+void preprocFreeOutputList(unsigned int **);
 
 /************** RELOAD ****************************/
 #ifdef SNORT_RELOAD
@@ -530,8 +530,10 @@ static void PreprocFunction(Packet *p,void *context)
             vgt123_old = vgt123;
             cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt123 = VGT_Init(pc->groups,pc->hashtest);
-            if(outputList != NULL) preprocFreeOutputList(outputList);
-            if(outputDiffList != NULL) preprocFreeOutputList(outputDiffList);
+            if(outputList != NULL) 
+                preprocFreeOutputList(outputList);
+            if(outputDiffList != NULL) 
+                preprocFreeOutputList(outputDiffList);
 
             LogMessage("COMPLETO124\n");
             outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
@@ -543,8 +545,10 @@ static void PreprocFunction(Packet *p,void *context)
             vgt124_old = vgt124;
             cgt124 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt124 = VGT_Init(pc->groups,pc->hashtest);
-            if(outputList != NULL) preprocFreeOutputList(outputList);
-            if(outputDiffList != NULL) preprocFreeOutputList(outputDiffList);          
+            if(outputList != NULL) 
+                preprocFreeOutputList(outputList);
+            if(outputDiffList != NULL) 
+                preprocFreeOutputList(outputDiffList);          
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
