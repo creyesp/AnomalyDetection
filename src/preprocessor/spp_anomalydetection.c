@@ -432,8 +432,8 @@ static void PreprocFunction(Packet *p,void *context)
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-    unsigned int ** outputList;
-    unsigned int ** outputDiffList;
+    unsigned int ** outputList, ** outputList123, ** outputList124;
+    unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124;
     double TimeInterval;
 
     int i,nlist,ndifflist;
@@ -501,7 +501,6 @@ static void PreprocFunction(Packet *p,void *context)
             vgt_old = vgt;
             cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt = VGT_Init(pc->groups,pc->hashtest);
-            preprocFreeOutputList(outputDiffList);
             if(outputList != NULL){
             //     nlist = outputList[0][0];
             //     for(i = 0; i < nlist; i++){
@@ -520,9 +519,10 @@ static void PreprocFunction(Packet *p,void *context)
                 preprocFreeOutputList(outputDiffList);
 
             }
+
             LogMessage("COMPLETO123\n");
-            outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
-            outputDiffList = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+            outputList123 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
+            outputDiffList123 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
             LogMessage("DISTROY 123\n");
 
             CGT_Destroy(cgt123_old);
@@ -533,15 +533,15 @@ static void PreprocFunction(Packet *p,void *context)
             cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt123 = VGT_Init(pc->groups,pc->hashtest);
             LogMessage("DISTROY LIST 123\n");
-            if(outputList != NULL) 
-                preprocFreeOutputList(outputList);
+            if(outputList123 != NULL) 
+                preprocFreeOutputList(outputList123);
             LogMessage("DISTROY LIST 123\n");
-            if(outputDiffList != NULL) 
-                preprocFreeOutputList(outputDiffList);
+            if(outputDiffList123 != NULL) 
+                preprocFreeOutputList(outputDiffList123);
 
             LogMessage("COMPLETO124\n");
-            outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
-            outputDiffList = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+            outputList124 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
+            outputDiffList124 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
 
             CGT_Destroy(cgt124_old);
             VGT_Destroy(vgt124_old);
@@ -549,10 +549,10 @@ static void PreprocFunction(Packet *p,void *context)
             vgt124_old = vgt124;
             cgt124 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt124 = VGT_Init(pc->groups,pc->hashtest);
-            if(outputList != NULL) 
-                preprocFreeOutputList(outputList);
-            if(outputDiffList != NULL) 
-                preprocFreeOutputList(outputDiffList);          
+            if(outputList124 != NULL) 
+                preprocFreeOutputList(outputList124);
+            if(outputDiffList124 != NULL) 
+                preprocFreeOutputList(outputDiffList124);          
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
