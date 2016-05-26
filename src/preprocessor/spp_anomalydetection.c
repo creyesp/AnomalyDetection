@@ -288,10 +288,10 @@ static void addCGT(Packet *p)
             srcport = (unsigned short int)p->sp;
             dstport = (unsigned short int)p->dp;
             packetsize = 1;
-            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize);
-            CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
-            VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
-            VGT_Update96(vgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
+            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize,p->dsize);
+            CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize,p->dsize); 
+            VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize,p->dsize); 
+            VGT_Update96(vgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize,p->dsize); 
         }
     }
        

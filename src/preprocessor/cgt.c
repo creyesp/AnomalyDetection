@@ -51,7 +51,7 @@ int comp96(const void *a, const void *b)
 }
 
 
-void loginsert(long long *lists, unsigned int val, int length, int diff) 
+void loginsert(long long *lists, unsigned int val, int length, int diff, int dsize) 
 {
   // add on a value of diff to the counts for item val
   int i;
@@ -66,9 +66,10 @@ void loginsert(long long *lists, unsigned int val, int length, int diff)
       lists[i] += diff;
     bitmask *= 2;
   }
+  lists[length+1] = dsize;
 }
 
-void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigned int val3, int length, int diff) 
+void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigned int val3, int length, int diff, int dsize) 
 {
   // add on a value of diff to the counts for item val
   int i;
@@ -92,6 +93,7 @@ void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigne
       bitmask=1;
     }
   }
+  list[length+1] = dsize; //tamaño del paquete
 }
 /************************************************************************/
 /*                                                                      */
@@ -117,7 +119,7 @@ CGT_type * CGT_Init(int buckets, int tests, int lgn)
   result->tests = tests;
   result->logn = lgn;
   result->buckets = buckets;
-  result->subbuckets=1+lgn;
+  result->subbuckets=1+lgn+1;
   result->count=0;
   result->testa=calloc(tests,sizeof(long long));
   result->testb=calloc(tests,sizeof(long long));
@@ -181,7 +183,7 @@ unsigned int testCGT(long long *count, int nbit, long long thresh)
 }
 
 //unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
-int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thresh)
+int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -220,12 +222,14 @@ int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thres
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
+    rtest[3] = count[0]
   }
   else{
     return 1;
     rtest[0] = 0;
     rtest[1] = 0;
     rtest[2] = 0;
+    rtest[3] = 0;
   }
     //return NULL;
   return 0;
@@ -248,7 +252,8 @@ void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff)
       offset+=cgt->buckets;
     }
 }
-void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip, unsigned short int srcport, unsigned short int dstport, int diff)
+void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip, 
+              unsigned short int srcport, unsigned short int dstport, int diff, int dsize)
 {
   // receive an update and process the groups accordingly
 
@@ -266,7 +271,7 @@ void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip, unsigne
       hash3 = hash31(cgt->testa[i],cgt->testb[i],ports);
       hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);;
       hash = hash % (cgt->buckets); 
-      loginsert96( cgt->counts[offset+hash], srcip, dstip, ports, cgt->logn,diff );
+      loginsert96( cgt->counts[offset+hash], srcip, dstip, ports, cgt->logn,diff , dsize);
       offset+=cgt->buckets;
     }
 }
@@ -374,7 +379,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
   // Find the hot items by doing the group testing
 
   int i=0,j=0,k=0, outputGuess;
-  unsigned int guess[3]={0,0,0};
+  unsigned int guess[4]={0,0,0,0};
   unsigned int **results, **compresults;
   unsigned int hits =0;
   unsigned int last[3];  
@@ -388,7 +393,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
   results=(unsigned int**)calloc(cgt->tests*cgt->buckets,sizeof(unsigned int*));
   if (results==NULL) exit(1); 
   for(i = 0; i < cgt->tests*cgt->buckets; i++){
-    results[i] = (unsigned int*)calloc(3,sizeof(unsigned int));
+    results[i] = (unsigned int*)calloc(5,sizeof(unsigned int));
     if (results[i] == NULL) exit(1); 
   }
   // make some space for the list of results
@@ -442,6 +447,8 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][0] = guess[0];
                   results[hits][1] = guess[1];
                   results[hits][2] = guess[2];
+                  results[hits][3] = guess[3];
+                  results[hits][4] = cgt->counts[testval][cgt->logn+2]/guess[3];
                   // LogMessage("Salida de resuls  : %u.%u.%u.%u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
                   // LogMessage("%u.%u.%u.%u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
                   // LogMessage("%u - %u \n", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
@@ -472,7 +479,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
       for(i = 0; i <= claimed; i++){
-        compresults[i] = calloc(3,sizeof(unsigned int));
+        compresults[i] = calloc(4,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
       } 
 
@@ -485,9 +492,12 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               compresults[claimed][0]=results[i][0];
               compresults[claimed][1]=results[i][1];
               compresults[claimed][2]=results[i][2];
+              compresults[claimed][3]=results[i][3];
+              compresults[claimed][4]=results[i][4];
               last[0]=results[i][0];
               last[1]=results[i][1];
               last[2]=results[i][2];
+
               // LogMessage("SORT  : %u.%u.%u.%u - ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
               // LogMessage("%u.%u.%u.%u - ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
               // LogMessage("%u - %u \n", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
