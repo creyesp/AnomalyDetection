@@ -33,6 +33,10 @@
 
 CGT_type *cgt, *cgt_old;
 VGT_type *vgt, *vgt_old;
+CGT_type *cgt124, *cgt124_old;
+VGT_type *vgt124, *vgt124_old;
+CGT_type *cgt123, *cgt123_old;
+VGT_type *vgt123, *vgt123_old;
 
 FILE *fptr,*file2, *dataflow;
 time_t LastLogTime, CurrentTime;
@@ -158,6 +162,15 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     vgt = VGT_Init(ad_Config->groups,ad_Config->hashtest);
     vgt_old = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
+    cgt123 = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    cgt123_old = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    vgt123 = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+    vgt123_old = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+
+    cgt124 = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    cgt124_old = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
+    vgt124 = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+    vgt124_old = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
     /* Agrega el preprocesar a una lista con prioridades al momento de acceder al dato bruto */
     AddFuncToPreprocList( sc, PreprocFunction, PRIORITY_SCANNER,  PP_SFPORTSCAN, PROTO_BIT__ALL);
@@ -292,6 +305,16 @@ static void addCGT(Packet *p)
             CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize,-1*(int)p->dsize); 
             VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
             VGT_Update96(vgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
+
+            CGT_Update96(cgt123, ipsrc,ipdst, srcport, 0, packetsize,(int)p->dsize);
+            CGT_Update96(cgt123_old, ipsrc,ipdst, srcport, 0, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update96(vgt123, ipsrc,ipdst, srcport, 0, packetsize); 
+            VGT_Update96(vgt123_old, ipsrc,ipdst, srcport, 0, -1*packetsize);   
+
+            CGT_Update96(cgt124, ipsrc,ipdst, 0, dstport, packetsize,(int)p->dsize);
+            CGT_Update96(cgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update96(vgt124, ipsrc,ipdst, 0, dstport, packetsize); 
+            VGT_Update96(vgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize);                       
         }
     }
        
@@ -449,6 +472,7 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("***************************************************\n");
             LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
+            LogMessage("COMPLETO\n");
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             // if(outputList != NULL){
             //     // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
@@ -468,7 +492,7 @@ static void PreprocFunction(Packet *p,void *context)
             //         LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
             //         LogMessage(" portSrc %5u portDst %5u packet %d size %d\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3],outputDiffList[i][4]);
             //     }
-            // }
+            // } 
 
             CGT_Destroy(cgt_old);
             VGT_Destroy(vgt_old);
@@ -476,21 +500,47 @@ static void PreprocFunction(Packet *p,void *context)
             vgt_old = vgt;
             cgt = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt = VGT_Init(pc->groups,pc->hashtest);
-            
-            if(outputList != NULL){
-                nlist = outputList[0][0];
-                for(i = 0; i < nlist; i++){
-                    free(outputList[i]);
-                }
-                free(outputList);                
-            }
+            preprocFreeOutputList(outputList);
+            preprocFreeOutputList(outpuDifftList);
+            // if(outputList != NULL){
+            //     nlist = outputList[0][0];
+            //     for(i = 0; i < nlist; i++){
+            //         free(outputList[i]);
+            //     }
+            //     free(outputList);                
+            // }
 
-            if(outputDiffList != NULL){
-                ndifflist = outputDiffList[0][0];
-                for(i = 0; i < ndifflist; i++){
-                    free(outputDiffList[i]);
-                }
-                free(outputDiffList);
+            // if(outputDiffList != NULL){
+            //     ndifflist = outputDiffList[0][0];
+            //     for(i = 0; i < ndifflist; i++){
+            //         free(outputDiffList[i]);
+            //     }
+            //     free(outputDiffList);
+            LogMessage("COMPLETO123\n");
+            outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
+            outputDiffList = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+
+            CGT_Destroy(cgt123_old);
+            VGT_Destroy(vgt123_old);
+            cgt123_old = cgt123;
+            vgt123_old = vgt123;
+            cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
+            vgt123 = VGT_Init(pc->groups,pc->hashtest);
+            preprocFreeOutputList(outputList);
+            preprocFreeOutputList(outpuDifftList);
+
+            LogMessage("COMPLETO124\n");
+            outputList = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
+            outputDiffList = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+
+            CGT_Destroy(cgt124_old);
+            VGT_Destroy(vgt124_old);
+            cgt124_old = cgt124;
+            vgt124_old = vgt124;
+            cgt124 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
+            vgt124 = VGT_Init(pc->groups,pc->hashtest);
+            preprocFreeOutputList(outputList);
+            preprocFreeOutputList(outpuDifftList);            
             }
         }
      
@@ -515,7 +565,15 @@ static void PreprocFunction(Packet *p,void *context)
 }
 
 
-
+void preprocFreeOutputList(unsigned int ** outputList){
+    if(outputList != NULL){
+        nlist = outputList[0][0];
+        for(i = 0; i < nlist; i++){
+            free(outputList[i]);
+        }
+        free(outputList);                
+    }
+}
 /* Function: SaveToLog(time_t LastLogTime)
  *
  * Purpose: Save current state of containers to log file.
