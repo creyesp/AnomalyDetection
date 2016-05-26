@@ -93,7 +93,7 @@ void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigne
       bitmask=1;
     }
   }
-  list[length+1] = dsize; //tamaño del paquete
+  lists[length+1] = dsize; //tamaño del paquete
 }
 /************************************************************************/
 /*                                                                      */
