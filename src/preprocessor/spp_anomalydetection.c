@@ -288,8 +288,8 @@ static void addCGT(Packet *p)
             srcport = (unsigned short int)p->sp;
             dstport = (unsigned short int)p->dp;
             packetsize = 1;
-            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize,p->dsize);
-            CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize,p->dsize); 
+            CGT_Update96(cgt, ipsrc,ipdst, srcport, dstport, packetsize,(int)p->dsize);
+            CGT_Update96(cgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize,-1*(int)p->dsize); 
             VGT_Update96(vgt, ipsrc,ipdst, srcport, dstport, packetsize); 
             VGT_Update96(vgt_old, ipsrc,ipdst, srcport, dstport, -1*packetsize); 
         }
@@ -299,10 +299,10 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s | %s | %d | %u | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"\n%s | %s | %d | %u | %u | %u | %u | %u | %u",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s | %s | %d | %u | %u | %u | %u | %u \n",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);            }
+                fprintf(dataflow,"\n%s | %s | %d | %u | %u | %u | %u | %u",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);            }
         }
             
 
