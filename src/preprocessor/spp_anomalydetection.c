@@ -533,8 +533,10 @@ static void PreprocFunction(Packet *p,void *context)
             cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt123 = VGT_Init(pc->groups,pc->hashtest);
             LogMessage("DISTROY LIST 123\n");
-            if(outputList123 != NULL) 
+            if(outputList123 != NULL) {
+                LogMessage("DISTROY LIST 123\n");
                 preprocFreeOutputList(outputList123);
+            }
             LogMessage("DISTROY LIST 123\n");
             if(outputDiffList123 != NULL) 
                 preprocFreeOutputList(outputDiffList123);

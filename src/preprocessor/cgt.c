@@ -505,10 +505,11 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               LogMessage("%5u | %5u # ", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
               LogMessage("%10d | %10d\n", compresults[claimed][3],compresults[claimed][4]);
               claimed++;
-
             }
         }
-        compresults[0][0]=claimed;  
+        compresults[0][0]=claimed;
+        LogMessage("%d",compresults[0][0]);  
+        LogMessage("**********************************************************FIN\n")
     } 
   else
     {
