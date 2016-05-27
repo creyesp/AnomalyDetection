@@ -508,7 +508,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
             }
         }
         compresults[0][0]=claimed;
-        LogMessage("%d",compresults[0][0]);  
+        LogMessage("Claimed %d\n",compresults[0][0]);  
         LogMessage("**********************************************************FIN\n");
     } 
   else
