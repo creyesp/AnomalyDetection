@@ -458,7 +458,7 @@ static void PreprocFunction(Packet *p,void *context)
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     unsigned int ** outputList, ** outputList123, ** outputList124, **outputListIPSRC;
-    unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputListDiffIPSRC;
+    unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputDiffListIPSRC;
     double TimeInterval;
 
     int i,nlist,ndifflist;
@@ -593,7 +593,7 @@ static void PreprocFunction(Packet *p,void *context)
             
             LogMessage("=================  IPdst Packets Dsize  =================  \n");
             outputListIPSRC = CGT_Output(cgtIPDST, vgtIPDST, ComputeThresh(cgtIPDST));
-            outputDiffListIPDST = CGT_Output(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
+            outputDiffListIPSRC = CGT_Output(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
 
             CGT_Destroy(cgt_oldIPDST);
             VGT_Destroy(vgt_oldIPDST);
