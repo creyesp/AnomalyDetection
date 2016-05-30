@@ -531,7 +531,7 @@ void CGT_Destroy(CGT_type * cgt)
   free(cgt->testa);
   free(cgt->testb);
 
-  for (i=0; i<cgt->buckets;i++)
+  for (i=0; i< cgt->buckets*cgt->tests;i++)
     free(cgt->counts[i]);
   free(cgt->counts);
   free (cgt);
