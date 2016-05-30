@@ -31,9 +31,9 @@
 //   } while (inc > 1);
 // }
 
-void shell(unsigned long n, unsigned int a[])
+void shell(const void *a, const void *b)
 {
-  size_t n = 0;
+  int n = 0;
   unsigned int **a_ptr = (unsigned int **)a;
   unsigned int **b_ptr = (unsigned int **)b;
   // printf("%d %d\n",*((unsigned int*)*a_ptr),*((unsigned int*)*b_ptr));
@@ -307,7 +307,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
   int pass = 0;
   int hash=0;
   
-  results=calloc(cgt->tests*cgt->buckets,sizeof(* unsigned int));
+  results = (unsigned int**)calloc(cgt->tests*cgt->buckets,sizeof(unsigned int *));
   if (results==NULL) exit(1); 
   for( i = 0; i < cgt->tests*cgt->buckets; i++){
     results[i] = calloc(3,sizeof(unsigned int));
@@ -374,7 +374,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last=results[i][0];
             }
         }
-      compresults = calloc(claimed+1,sizeof(*unsigned int));
+      compresults = calloc(claimed+1,sizeof(unsigned int *));
       if( compresults == NULL ) exit(1);
       for(i = 0; i <= claimed; i++){
         compresults[i] = calloc(3,sizeof(unsigned int));
