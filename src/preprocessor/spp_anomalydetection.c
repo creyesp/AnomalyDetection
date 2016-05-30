@@ -348,10 +348,10 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             if(p->tcph != NULL){
-                fprintf(dataflow,"\n%s | %s | %d | %u | %u | %u | %u | %u | %u",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"\n%s,%s,%d,%u,%u,%u,%u,%u,%u",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"\n%s | %s | %d | %u | %u | %u | %u | %u",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);            }
+                fprintf(dataflow,"\n%s,%s,%d,%u,%u,%u,%u,%u,-1",iphs, iphd, p->dsize, p->sp, p->dp, p->iph->ip_len, p->pkth->pktlen, p->iph->ip_proto);            }
         }
             
 
