@@ -479,7 +479,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if (compresults==NULL) exit(1);
       for(i = 0; i <= claimed; i++){
-        compresults[i] = calloc(4,sizeof(unsigned int));
+        compresults[i] = calloc(5,sizeof(unsigned int));
         if(compresults[i] == NULL) exit(1);
       } 
 
