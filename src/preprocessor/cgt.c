@@ -4,31 +4,48 @@
 #include "prng.h"
 #include "util.h" //para usar LogMessage
 
+// void shell(unsigned long n, unsigned int a[])
+// {
+//   // A shell sort routine taken from the web
+//   // to sort the output of the Group Testing
+
+//   unsigned long i,j,inc;
+//   int v;
+//   inc=1;
+//   do {
+//     inc *= 3;
+//     inc++;
+//   } while (inc <= n);
+//   do { 
+//     inc /= 3;
+//     for ( i = inc; i <= n; i++ ) { 
+//       v = a[i];
+//       j = i;
+//       while ( a[j-inc] > v) {
+//         a[j] = a[j-inc];
+//         j -= inc;
+//         if (j < inc) break;
+//       }
+//       a[j] = v;
+//     }
+//   } while (inc > 1);
+// }
+
 void shell(unsigned long n, unsigned int a[])
 {
-  // A shell sort routine taken from the web
-  // to sort the output of the Group Testing
-
-  unsigned long i,j,inc;
-  int v;
-  inc=1;
-  do {
-    inc *= 3;
-    inc++;
-  } while (inc <= n);
-  do { 
-    inc /= 3;
-    for ( i = inc; i <= n; i++ ) { 
-      v = a[i];
-      j = i;
-      while ( a[j-inc] > v) {
-        a[j] = a[j-inc];
-        j -= inc;
-        if (j < inc) break;
-      }
-      a[j] = v;
+  size_t n = 0;
+  unsigned int **a_ptr = (unsigned int **)a;
+  unsigned int **b_ptr = (unsigned int **)b;
+  // printf("%d %d\n",*((unsigned int*)*a_ptr),*((unsigned int*)*b_ptr));
+    if (b_ptr[0][n] > a_ptr[0][n]) {
+      return 1;
     }
-  } while (inc > 1);
+    if (a_ptr[0][n] > b_ptr[0][n]) {
+      return -1;
+  }
+  return 0;
+
+
 }
 
 /*    sort array 2d     */
@@ -290,11 +307,11 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
   int pass = 0;
   int hash=0;
   
-  results=calloc(cgt->tests*cgt->buckets,sizeof(*unsigned int));
+  results=calloc(cgt->tests*cgt->buckets,sizeof(* unsigned int));
   if (results==NULL) exit(1); 
   for( i = 0; i < cgt->tests*cgt->buckets; i++){
     results[i] = calloc(3,sizeof(unsigned int));
-    if(resuls[i] == NULL) exit(1);
+    if(results[i] == NULL) exit(1);
   }
   // make some space for the list of results
   
@@ -347,7 +364,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
   if (hits>0)
     {
       // sort the output
-      shell(hits-1,results);
+      qsort(results, cgt->tests*cgt->buckets , sizeof *results, shell);
       last=0; claimed=0;
       for (i=0;i<hits;i++)
         { 
@@ -373,7 +390,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
               compresults[claimed++][0]=results[i][0];
               compresults[claimed++][1]=results[i][1];
               compresults[claimed++][2]=results[i][2];
-              last=results[i];
+              last=results[i][0];
 
               LogMessage("SORT  : %3u.%3u.%3u.%3u # ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
               LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
