@@ -537,8 +537,8 @@ static void PreprocFunction(Packet *p,void *context)
                 preprocFreeOutputList(outputDiffList123);
 
             LogMessage("         IPsrc IPdst - Pdst Packets Dsize\n");
-            outputList124 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
-            outputDiffList124 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
+            outputList124 = CGT_Output96(cgt124, vgt124, ComputeThresh(cgt124));
+            outputDiffList124 = CGT_Output96(cgt124_old, vgt124_old, ComputeDiffThresh(cgt124_old));    
 
             CGT_Destroy(cgt124_old);
             VGT_Destroy(vgt124_old);
@@ -576,9 +576,11 @@ void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
     
     nlist = **outputList;
+    LogMessage("Nlist %d\n"nlist);
     for(i = 0; i < nlist; i++)
         free(*(outputList+i));
     free(outputList); 
+    LogMessage("Liberado...");
 }
 /* Function: SaveToLog(time_t LastLogTime)
  *
