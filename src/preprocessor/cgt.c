@@ -378,7 +378,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
               LogMessage("%10d | %10d\n", results[i][1],results[i][2]);
             }
         }
-      LogMessage("Claimed %d",claimed);
+      LogMessage("Claimed %d\n",claimed);
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if( compresults == NULL ) exit(1);
       for(i = 0; i <= claimed; i++){
@@ -392,13 +392,14 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
         { 
           if (results[i][0]!=last)
             {   // For each distinct item in the output...
-              compresults[claimed++][0]=results[i][0];
-              compresults[claimed++][1]=results[i][1];
-              compresults[claimed++][2]=results[i][2];
+              compresults[claimed][0]=results[i][0];
+              compresults[claimed][1]=results[i][1];
+              compresults[claimed][2]=results[i][2];
               last=results[i][0];
 
               LogMessage("SORT  : %3u.%3u.%3u.%3u # ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
               LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
+              claimed++;
             }
         }
       compresults[0][0]=claimed;      
