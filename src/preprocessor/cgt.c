@@ -31,7 +31,7 @@
 //   } while (inc > 1);
 // }
 
-void shell(const void *a, const void *b)
+int shell(const void *a, const void *b)
 {
   int n = 0;
   unsigned int **a_ptr = (unsigned int **)a;
