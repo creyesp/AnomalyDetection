@@ -397,7 +397,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
               compresults[claimed][2]=results[i][2];
               last=results[i][0];
 
-              LogMessage("SORT  : %3u.%3u.%3u.%3u # ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
               LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
               claimed++;
             }
@@ -545,8 +545,8 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last[1]=results[i][1];
               last[2]=results[i][2];
 
-              LogMessage("SORT  : %3u.%3u.%3u.%3u | ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
-              LogMessage("%3u.%3u.%3u.%3u | ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u) | ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24, compresults[claimed][0]);
+              LogMessage("%3u.%3u.%3u.%3u (%10u)| ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24, compresults[claimed][1]);
               LogMessage("%5u | %5u # ", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
               LogMessage("%10d | %10d\n", compresults[claimed][3],compresults[claimed][4]);
               claimed++;
