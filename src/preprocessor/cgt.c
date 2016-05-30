@@ -183,7 +183,7 @@ unsigned int testCGT(long long *count, int nbit, long long thresh)
 }
 
 //unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
-int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thresh)
+int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
@@ -223,14 +223,12 @@ int testCGT96(unsigned int rtest[4], long long *count, int nbit, long long thres
     rtest[0] = result[0];
     rtest[1] = result[1];
     rtest[2] = result[2];
-    rtest[3] = count[0];
   }
   else{
     return 1;
     rtest[0] = 0;
     rtest[1] = 0;
     rtest[2] = 0;
-    rtest[3] = 0;
   }
     //return NULL;
   return 0;
@@ -380,7 +378,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
   // Find the hot items by doing the group testing
 
   int i=0,j=0,k=0, outputGuess;
-  unsigned int guess[4]={0,0,0,0};
+  unsigned int guess[3]={0,0,0};
   unsigned int **results, **compresults;
   unsigned int hits =0;
   unsigned int last[3];  
@@ -473,9 +471,9 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last[0]=results[i][0];
               last[1]=results[i][1];
               last[2]=results[i][2];
-              LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
-              LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
-              LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
+              // LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
+              // LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
+              // LogMessage("%u - %u \n", (results[i][2]&0xffff0000)>>16,results[i][2]&0x0000ffff);
             }
         }
       compresults = calloc(claimed+1,sizeof(unsigned int *));
@@ -500,15 +498,15 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
               last[1]=results[i][1];
               last[2]=results[i][2];
 
-              // LogMessage("SORT  : %3u.%3u.%3u.%3u | ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
-              // LogMessage("%3u.%3u.%3u.%3u | ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
-              // LogMessage("%5u | %5u # ", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
-              // LogMessage("%10d | %10d\n", compresults[claimed][3],compresults[claimed][4]);
+              LogMessage("SORT  : %3u.%3u.%3u.%3u | ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("%3u.%3u.%3u.%3u | ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              LogMessage("%5u | %5u # ", (compresults[claimed][2]&0xffff0000)>>16,compresults[claimed][2]&0x0000ffff);
+              LogMessage("%10d | %10d\n", compresults[claimed][3],compresults[claimed][4]);
               claimed++;
             }
         }
         compresults[0][0]=claimed;
-        // LogMessage("Claimed %d\n",compresults[0][0]);  
+        LogMessage("Claimed %d\n",compresults[0][0]);  
     } 
   else
     {

@@ -576,11 +576,11 @@ void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
     
     nlist = **outputList;
-    LogMessage("Nlist %d\n"nlist);
+    LogMessage("Nlist %d\n",nlist);
     for(i = 0; i < nlist; i++)
         free(*(outputList+i));
     free(outputList); 
-    LogMessage("Liberado...");
+    LogMessage("Liberado...\n");
 }
 /* Function: SaveToLog(time_t LastLogTime)
  *
