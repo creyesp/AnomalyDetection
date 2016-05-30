@@ -355,8 +355,8 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][0] = guess;
                   results[hits][1] = (unsigned int)cgt->counts[testval][0];
                   results[hits][2] = (unsigned int)(cgt->counts[testval][32+1]/cgt->counts[testval][0]);
-                  LogMessage("RESULT  : %3u.%3u.%3u.%3u # ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
-                  LogMessage("%10d | %10d\n", results[hits][1],results[hits][2]);
+                  // LogMessage("RESULT  : %3u.%3u.%3u.%3u # ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  // LogMessage("%10d | %10d\n", results[hits][1],results[hits][2]);
                   hits++;
                 }
             }
@@ -374,11 +374,11 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
             {   // For each distinct item in the output...
               claimed++;
               last=results[i][0];
-              LogMessage("RESULT  : %3u.%3u.%3u.%3u # ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
-              LogMessage("%10d | %10d\n", results[i][1],results[i][2]);
+              // LogMessage("RESULT  : %3u.%3u.%3u.%3u # ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
+              // LogMessage("%10d | %10d\n", results[i][1],results[i][2]);
             }
         }
-      LogMessage("Claimed %d\n",claimed);
+      // LogMessage("Claimed %d\n",claimed);
       compresults = calloc(claimed+1,sizeof(unsigned int *));
       if( compresults == NULL ) exit(1);
       for(i = 0; i <= claimed; i++){
