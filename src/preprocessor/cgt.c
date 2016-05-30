@@ -275,14 +275,14 @@ void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip,
     }
 }
 
-unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
+unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
 {
   // Find the hot items by doing the group testing
 
   int i=0,j=0,k=0;
   unsigned int guess=0;
-  unsigned int * results;
-  static unsigned int *compresults;
+  unsigned int ** results;
+  static unsigned int **compresults;
   unsigned long hits =0;
   int last=-1;  
   int claimed=0;  
@@ -290,8 +290,12 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
   int pass = 0;
   int hash=0;
   
-  results=calloc(cgt->tests*cgt->buckets,sizeof(unsigned int));
+  results=calloc(cgt->tests*cgt->buckets,sizeof(*unsigned int));
   if (results==NULL) exit(1); 
+  for( i = 0; i < cgt->tests*cgt->buckets; i++){
+    results[i] = calloc(3,sizeof(unsigned int));
+    if(resuls[i] == NULL) exit(1);
+  }
   // make some space for the list of results
   
   for (i=0;i<cgt->tests;i++)
@@ -331,7 +335,9 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
               if (pass==1)
                 { 
                   // if the item passes all the tests, then output it
-                  results[hits]=guess;
+                  results[hits][0] = guess;
+                  results[hits][1] = (unsigned int)cgt->counts[testval][0];
+                  results[hits][2] = (unsigned int)(cgt->counts[testval][32+1]/cgt->counts[testval][0]);
                   hits++;
                 }
             }
@@ -345,30 +351,48 @@ unsigned int * CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
       last=0; claimed=0;
       for (i=0;i<hits;i++)
         { 
-          if (results[i]!=last)
+          if (results[i][0]!=last)
             {   // For each distinct item in the output...
               claimed++;
-              last=results[i];
+              last=results[i][0];
             }
         }
-      compresults=(unsigned int *) calloc(claimed+1,sizeof(unsigned int));
-      compresults[0]=claimed;
+      compresults = calloc(claimed+1,sizeof(*unsigned int));
+      if( compresults == NULL ) exit(1);
+      for(i = 0; i <= claimed; i++){
+        compresults[i] = calloc(3,sizeof(unsigned int));
+        if(compresults[i] == NULL) exit(1);
+      }
+
       claimed=1; last=0;
 
       for (i=0;i<hits;i++)
         { 
-          if (results[i]!=last)
+          if (results[i][0]!=last)
             {   // For each distinct item in the output...
-              compresults[claimed++]=results[i];
+              compresults[claimed++][0]=results[i][0];
+              compresults[claimed++][1]=results[i][1];
+              compresults[claimed++][2]=results[i][2];
               last=results[i];
+
+              LogMessage("SORT  : %3u.%3u.%3u.%3u # ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
             }
-        }      
+        }
+      compresults[0][0]=claimed;      
     }
   else
     {
-      compresults=(unsigned int *) malloc(sizeof(unsigned int));
-      compresults[0]=0;
+      for(i = 0; i < cgt->tests*cgt->buckets; i++){
+        free(results[i]);
+      }
+      free(results);
+      return NULL;
     }
+
+  for(i = 0; i < cgt->tests*cgt->buckets; i++){
+    free(results[i]);
+  }
   free(results);
   return(compresults);
 }  
@@ -506,7 +530,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
             }
         }
         compresults[0][0]=claimed;
-        LogMessage("Claimed %d\n",compresults[0][0]);  
+        // LogMessage("Claimed %d\n",compresults[0][0]);  
     } 
   else
     {

@@ -37,6 +37,11 @@ CGT_type *cgt124, *cgt124_old;
 VGT_type *vgt124, *vgt124_old;
 CGT_type *cgt123, *cgt123_old;
 VGT_type *vgt123, *vgt123_old;
+CGT_type *cgtIPSRC, *cgt_oldIPSRC;
+VGT_type *vgtIPSRC, *vgt_oldIPSRC;
+CGT_type *cgtIPDST, *cgt_oldIPDST;
+VGT_type *vgtIPDST, *vgt_oldIPDST;
+
 
 FILE *fptr,*file2, *dataflow;
 time_t LastLogTime, CurrentTime;
@@ -172,6 +177,16 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     cgt124_old = CGT_Init(ad_Config->groups,ad_Config->hashtest,ad_Config->lgn);
     vgt124 = VGT_Init(ad_Config->groups,ad_Config->hashtest);
     vgt124_old = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+
+    cgtIPSRC = CGT_Init(ad_Config->groups,ad_Config->hashtest,32);
+    cgt_oldIPSRC = CGT_Init(ad_Config->groups,ad_Config->hashtest,32);
+    vgtIPSRC = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+    vgt_oldIPSRC = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+
+    cgtIPDST = CGT_Init(ad_Config->groups,ad_Config->hashtest,32);
+    cgt_oldIPDST = CGT_Init(ad_Config->groups,ad_Config->hashtest,32);
+    vgtIPDST = VGT_Init(ad_Config->groups,ad_Config->hashtest);
+    vgt_oldIPDST = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
     /* Agrega el preprocesar a una lista con prioridades al momento de acceder al dato bruto */
     AddFuncToPreprocList( sc, PreprocFunction, PRIORITY_SCANNER,  PP_SFPORTSCAN, PROTO_BIT__ALL);
@@ -315,7 +330,17 @@ static void addCGT(Packet *p)
             CGT_Update96(cgt124, ipsrc,ipdst, 0, dstport, packetsize,(int)p->dsize);
             CGT_Update96(cgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize,-1*(int)p->dsize); 
             VGT_Update96(vgt124, ipsrc,ipdst, 0, dstport, packetsize); 
-            VGT_Update96(vgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize);                       
+            VGT_Update96(vgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize);   
+
+            CGT_Update(cgtIPSRC, ipsrc, packetsize,(int)p->dsize);
+            CGT_Update(cgt_oldIPSRC, ipsrc, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update(vgtIPSRC, ipsrc, packetsize); 
+            VGT_Update(vgt_oldIPSRC, ipsrc, -1*packetsize);                    
+
+            CGT_Update(cgtIPDST, ipdst, packetsize,(int)p->dsize);
+            CGT_Update(cgt_oldIPDST, ipdst, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update(vgtIPDST, ipdst, packetsize); 
+            VGT_Update(vgt_oldIPDST, ipdst, -1*packetsize);  
         }
     }
        
@@ -432,8 +457,8 @@ static void PreprocFunction(Packet *p,void *context)
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-    unsigned int ** outputList, ** outputList123, ** outputList124;
-    unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124;
+    unsigned int ** outputList, ** outputList123, ** outputList124, **outputListIPSRC;
+    unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputListDiffIPSRC;
     double TimeInterval;
 
     int i,nlist,ndifflist;
@@ -473,7 +498,7 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("\n************************************************************************\n");
             LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
-            LogMessage("         IPsrc IPdst Psrc Pdst Packets Dsize\n");
+            LogMessage("=================  IPsrc IPdst Psrc Pdst Packets Dsize  =================  \n");
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             // if(outputList != NULL){
             //     // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
@@ -520,7 +545,7 @@ static void PreprocFunction(Packet *p,void *context)
 
             }
 
-            LogMessage("         IPsrc IPdst Psrc  - Packets Dsize\n");
+            LogMessage("=================   IPsrc IPdst Psrc  - Packets Dsize  =================  \n");
             outputList123 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
             outputDiffList123 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
 
@@ -536,7 +561,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(outputDiffList123 != NULL) 
                 preprocFreeOutputList(outputDiffList123);
 
-            LogMessage("         IPsrc IPdst - Pdst Packets Dsize\n");
+            LogMessage("=================  IPsrc IPdst - Pdst Packets Dsize  =================  \n");
             outputList124 = CGT_Output96(cgt124, vgt124, ComputeThresh(cgt124));
             outputDiffList124 = CGT_Output96(cgt124_old, vgt124_old, ComputeDiffThresh(cgt124_old));    
 
@@ -549,7 +574,37 @@ static void PreprocFunction(Packet *p,void *context)
             if(outputList124 != NULL) 
                 preprocFreeOutputList(outputList124);
             if(outputDiffList124 != NULL) 
-                preprocFreeOutputList(outputDiffList124);          
+                preprocFreeOutputList(outputDiffList124);     
+            
+            LogMessage("=================  IPsrc Packets Dsize  =================  \n");
+            outputListIPSRC = CGT_Output(cgtIPSRC, vgtIPSRC, ComputeThresh(cgtIPSRC));
+            outputDiffListIPSRC = CGT_Output(cgt_oldIPSRC, vgt_oldIPSRC, ComputeDiffThresh(cgt_oldIPSRC));    
+
+            CGT_Destroy(cgt_oldIPSRC);
+            VGT_Destroy(vgt_oldIPSRC);
+            cgt_oldIPSRC = cgtIPSRC;
+            vgt_oldIPSRC = vgtIPSRC;
+            cgtIPSRC = CGT_Init(pc->groups,pc->hashtest,32);
+            vgtIPSRC = VGT_Init(pc->groups,pc->hashtest);
+            if(outputListIPSRC != NULL) 
+                preprocFreeOutputList(outputListIPSRC);
+            if(outputDiffListIPSRC != NULL) 
+                preprocFreeOutputList(outputDiffListIPSRC);        
+            
+            LogMessage("=================  IPdst Packets Dsize  =================  \n");
+            outputListIPSRC = CGT_Output(cgtIPDST, vgtIPDST, ComputeThresh(cgtIPDST));
+            outputDiffListIPDST = CGT_Output(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
+
+            CGT_Destroy(cgt_oldIPDST);
+            VGT_Destroy(vgt_oldIPDST);
+            cgt_oldIPDST = cgtIPDST;
+            vgt_oldIPDST = vgtIPDST;
+            cgtIPDST = CGT_Init(pc->groups,pc->hashtest,32);
+            vgtIPDST = VGT_Init(pc->groups,pc->hashtest);
+            if(outputListIPSRC != NULL) 
+                preprocFreeOutputList(outputListIPSRC);
+            if(outputDiffListIPSRC != NULL) 
+                preprocFreeOutputList(outputDiffListIPSRC);  
         }
      
         if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
@@ -576,11 +631,11 @@ void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
     
     nlist = **outputList;
-    LogMessage("Nlist %d\n",nlist);
+    // LogMessage("Nlist %d\n",nlist);
     for(i = 0; i < nlist; i++)
         free(*(outputList+i));
     free(outputList); 
-    LogMessage("Liberado...\n");
+    // LogMessage("Liberado...\n");
 }
 /* Function: SaveToLog(time_t LastLogTime)
  *
