@@ -470,10 +470,10 @@ static void PreprocFunction(Packet *p,void *context)
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
             SaveToLog(LastLogTime); //save in the log file the current count data
-            LogMessage("***************************************************\n");
+            LogMessage("\n************************************************************************\n");
             LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
-            LogMessage("COMPLETO\n");
+            LogMessage("         IPsrc IPdst Psrc Pdst Packets Dsize\n");
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
             // if(outputList != NULL){
             //     // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
@@ -520,7 +520,7 @@ static void PreprocFunction(Packet *p,void *context)
 
             }
 
-            LogMessage("COMPLETO123\n");
+            LogMessage("         IPsrc IPdst Psrc  - Packets Dsize\n");
             outputList123 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
             outputDiffList123 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
 
@@ -530,16 +530,13 @@ static void PreprocFunction(Packet *p,void *context)
             vgt123_old = vgt123;
             cgt123 = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgt123 = VGT_Init(pc->groups,pc->hashtest);
-            LogMessage("DISTROY LIST 123\n");
             if(outputList123 != NULL) {
-                LogMessage("DISTROY LIST 123\n");
                 preprocFreeOutputList(outputList123);
             }
-            LogMessage("DISTROY LIST 123\n");
             if(outputDiffList123 != NULL) 
                 preprocFreeOutputList(outputDiffList123);
 
-            LogMessage("COMPLETO124\n");
+            LogMessage("         IPsrc IPdst - Pdst Packets Dsize\n");
             outputList124 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
             outputDiffList124 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old));    
 
@@ -579,11 +576,9 @@ void preprocFreeOutputList(unsigned int ** outputList){
     int i,nlist;
     
     nlist = **outputList;
-    LogMessage("nlist %u\n",nlist);
     for(i = 0; i < nlist; i++)
         free(*(outputList+i));
     free(outputList); 
-    LogMessage("Se libero\n");               
 }
 /* Function: SaveToLog(time_t LastLogTime)
  *
