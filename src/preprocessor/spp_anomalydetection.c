@@ -511,19 +511,20 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
             LogMessage("=================  IPsrc IPdst Psrc Pdst Packets Dsize  =================  \n");
             outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));            
-            if ( file2 != NULL && ftell(file2) == 0 )
+            if ( file2 != NULL)
             {
                 if(outputList != NULL){
-                    // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
+                    LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
                     for(i=1; i < outputList[0][0]; i++)
                     {
                         LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                         LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        fprintf(file2,"%s", ctime(&LastLogTime));
-                        fprintf(file2,"%u.%u.%u.%u,",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        fprintf(file2,"%u.%u.%u.%u,",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        fprintf(file2,"%u,%u,%u,%u\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                        fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                        fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                        fprintf(file2,"%u,%u,%u,%u,",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                        fprintf(file2,"\"%s\"", ctime(&LastLogTime));
+
                     }
                 }
             }
