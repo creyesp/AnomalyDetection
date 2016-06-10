@@ -358,10 +358,10 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             time( &timestampDF );
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s,%s,%u,%s,%u,%d,%u,%u,%u,%u,%u,%u\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,%u\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s,%s,%u,%s,%u,%d,%u,%u,%u,%u,%u,-1\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,-1\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
         }
             
 
@@ -470,8 +470,8 @@ static void PreprocFunction(Packet *p,void *context)
     unsigned int ** outputList, ** outputList123, ** outputList124, **outputListIPSRC;
     unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputDiffListIPSRC;
     double TimeInterval;
-
     int i,nlist,ndifflist;
+    
 
     if(flag==0) //check if it is new file, all new log files need to have header
     {
@@ -480,7 +480,7 @@ static void PreprocFunction(Packet *p,void *context)
         {
             LogMessage("AnomalyDetection: Creating new log file in %s.\n",pc->LogPath);
             time( &LastLogTime );
-            fprintf(file2,"hora,ip\n");
+            fprintf(file2,"Date,Ipsrc,Ipdst,Ps,Pd,#Packets,AVGSize\n");
             time( &CurrentTime );
             LogMessage("%s",ctime(&CurrentTime));
             TimeInterval = difftime(CurrentTime,LastLogTime);
@@ -504,21 +504,33 @@ static void PreprocFunction(Packet *p,void *context)
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
-            SaveToLog(LastLogTime); //save in the log file the current count data
+            file2=fopen(pc->LogPath,"a");
+
+            //SaveToLog(LastLogTime); //save in the log file the current count data
             LogMessage("\n************************************************************************\n");
             LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
             LogMessage("=================  IPsrc IPdst Psrc Pdst Packets Dsize  =================  \n");
-            outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));
-            // if(outputList != NULL){
-            //     // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
-            //     for(i=1; i < outputList[0][0]; i++)
-            //     {
-            //         LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-            //         LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-            //         LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-            //     }
-            // }
+            outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));            
+            if ( file2 != NULL && ftell(file2) == 0 )
+            {
+                if(outputList != NULL){
+                    // LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
+                    for(i=1; i < outputList[0][0]; i++)
+                    {
+                        LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                        LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                        LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                        fprintf(file2,"%s", ctime(&LastLogTime));
+                        fprintf(file2,"%u.%u.%u.%u,",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                        fprintf(file2,"%u.%u.%u.%u,",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                        fprintf(file2,"%u,%u,%u,%u\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                    }
+                }
+            }
+            fclose(file2);
+
+
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
             // if(outputDiffList != NULL){
             //     LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
