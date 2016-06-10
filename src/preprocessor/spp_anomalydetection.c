@@ -523,7 +523,7 @@ static void PreprocFunction(Packet *p,void *context)
                         fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                         fprintf(file2,"%u,%u,%u,%u,",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        fprintf(file2,"\"%s\"", ctime(&LastLogTime));
+                        fprintf(file2,"%s", ctime(&LastLogTime));
 
                     }
                 }
