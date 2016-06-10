@@ -198,8 +198,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     if ( dataflow != NULL && ftell(dataflow) == 0 )
         {
             LogMessage("AnomalyDetection: Creating new DATAFLOW file\n");
-            fprintf(dataflow,"DATE,IP_SRC,IP_SRC_d,IP_DST,IP_DST_d,PORT_SRC,PORT_DST,DSIZE,PKLEN,IP_LEN,IP_PROTO,TH_FLAG\n");
-            }   
+            fprintf(dataflow,"DATE,IP_SRC,IP_SRC_d,IP_DST,IP_DST_d,PORT_SRC,PORT_DST,DSIZE,PKLEN,IP_LEN,IP_PROTO,TH_FLAG\n");   
         }else{
             LogMessage("AnomalyDetection: Opened an existing DATAFLOW\n");
         }
@@ -358,10 +357,10 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             time( &timestampDF );
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,%u\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,%u\n",ctime(&timestampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,-1\n",ctime(&timeStampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,-1\n",ctime(&timestampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
         }
             
 
