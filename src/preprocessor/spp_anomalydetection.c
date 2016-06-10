@@ -315,6 +315,8 @@ static void addCGT(Packet *p)
     char iphs[INET_ADDRSTRLEN];
     char iphd[INET_ADDRSTRLEN];
     time_t timestampDF;
+    struct tm* tmlocal;
+    char strdate[200];
 
     if(p->tcph!=NULL)
     {
@@ -356,11 +358,14 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             time( &timestampDF );
+
+            tmlocal = localtime(&timestampDF);
+            strftime(strdate, 200, "\"%x %X\"", tmlocal);
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,%u\n",ctime(&timestampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"\"%s\",\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,%u\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,-1\n",ctime(&timestampDF), iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
+                fprintf(dataflow,"\"%s\",\"%s\",%u,\"%s\",%u,%d,%u,%u,%u,%u,%u,-1\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
         }
             
 
@@ -527,7 +532,7 @@ static void PreprocFunction(Packet *p,void *context)
                         fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                         fprintf(file2,"%u,%u,%u,%u,",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                         tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "%c", tmlocal);
+                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
                         fprintf(file2,"%s\n", strdate);
 
 
