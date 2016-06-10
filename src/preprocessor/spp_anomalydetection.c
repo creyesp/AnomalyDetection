@@ -470,6 +470,9 @@ static void PreprocFunction(Packet *p,void *context)
     unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputDiffListIPSRC;
     double TimeInterval;
     int i,nlist,ndifflist;
+    struct tm* tmlocal;
+    char strdate[200];
+
     
 
     if(flag==0) //check if it is new file, all new log files need to have header
@@ -523,7 +526,12 @@ static void PreprocFunction(Packet *p,void *context)
                         fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         fprintf(file2,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                         fprintf(file2,"%u,%u,%u,%u,",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        fprintf(file2,"%s", ctime(&LastLogTime));
+                        tmlocal = localtime(&LastLogTime);
+                        strftime(strdate, 200, "%c", tmlocal);
+                        fprintf(file2,"%s\n", strdate);
+
+
+
 
                     }
                 }
