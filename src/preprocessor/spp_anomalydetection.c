@@ -362,10 +362,10 @@ static void addCGT(Packet *p)
             tmlocal = localtime(&timestampDF);
             strftime(strdate, 200, "\"%x %X\"", tmlocal);
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%6u,%6u,%u,%u,%u,%3u,%4u\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%6u,%6u,%u,%u,%u,%3u,-0001\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
+                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,-0001\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
         }
             
 
