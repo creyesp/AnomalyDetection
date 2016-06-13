@@ -365,9 +365,9 @@ static void addCGT(Packet *p)
             strftime(strdate, 200, "\"%x %X\"", tmlocal);
 
             start_t = clock();
-            difftime_pkt = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+            difftime_pkt = ((double)( start_t - end_t ));
             end_t = clock();
-            
+
             if(p->tcph != NULL){
                 fprintf(dataflow,"%f,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
