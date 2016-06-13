@@ -44,7 +44,7 @@ VGT_type *vgtIPDST, *vgt_oldIPDST;
 
 
 FILE *fptr,*file2, *dataflow;
-time_t LastLogTime, CurrentTime;
+time_t LastLogTime, CurrentTime, LastPktTime;
 int countpaket;
 
 
@@ -314,9 +314,11 @@ static void addCGT(Packet *p)
     sfip_t *psrc;
     char iphs[INET_ADDRSTRLEN];
     char iphd[INET_ADDRSTRLEN];
-    time_t timestampDF;
+
+    time_t timestampDF, timestampDF_old;
     struct tm* tmlocal;
     char strdate[200];
+    float difftime_pkt;
 
     if(p->tcph!=NULL)
     {
@@ -358,14 +360,15 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             time( &timestampDF );
-
+            difftime_pkt = difftime( &CurrentTime, &LastPktTime );
             tmlocal = localtime(&timestampDF);
             strftime(strdate, 200, "\"%x %X\"", tmlocal);
             if(p->tcph != NULL){
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
+                fprintf(dataflow,"%f,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,-0001\n",strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            }
+                fprintf(dataflow,"%f,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%0  3u,-0001\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            
+            }
         }
             
 
@@ -489,6 +492,7 @@ static void PreprocFunction(Packet *p,void *context)
             time( &LastLogTime );
             fprintf(file2,"Date,Ipsrc,Ipdst,Ps,Pd,#Packets,AVGSize\n");
             time( &CurrentTime );
+            time( &LastPktTime );
             LogMessage("%s",ctime(&CurrentTime));
             TimeInterval = difftime(CurrentTime,LastLogTime);
             while(TimeInterval > pc->GatherTime){
@@ -649,11 +653,12 @@ static void PreprocFunction(Packet *p,void *context)
         addCGT(p); //agrega el nuevo paquete a la estructura
         // PREPROC_PROFILE_END(ad_perf_stats);
         countpaket=0;
+        time( &LastPktTime );
     }
     else{
         addCGT(p);
         countpaket++;
-
+        time( &LastPktTime );
     } 
 }
 
