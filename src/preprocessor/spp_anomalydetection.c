@@ -529,8 +529,8 @@ static void PreprocFunction(Packet *p,void *context)
             output124diff = fopen("/var/log/snort/output124diff.txt","a");
             outputIpsrc = fopen("/var/log/snort/outputIpsrc.txt","a");
             outputIpsrcdiff = fopen("/var/log/snort/outputIpsrcdiff.txt","a");
-            outputIpdst = fopen("/var/log/snort/outputIpdst.txt","a");
-            outputIpdstdiff = fopen("/var/log/snort/outputIpdstdiff.txt","a");
+            // outputIpdst = fopen("/var/log/snort/outputIpdst.txt","a");
+            // outputIpdstdiff = fopen("/var/log/snort/outputIpdstdiff.txt","a");
 
             //SaveToLog(LastLogTime); //save in the log file the current count data
             LogMessage("\n************************************************************************\n");
@@ -549,7 +549,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputFULL,"%f,%s,", TimeInterval ,strdate);
+                        fprintf(outputFULL,"%s," ,strdate);
                         fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                         fprintf(outputFULL,"%u,%u,%u,%u\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
@@ -580,7 +580,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputFULLdiff,"%f,%s,", TimeInterval, strdate);
+                        fprintf(outputFULLdiff,"%s,", strdate);
                         fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
                         fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
                         fprintf(outputFULLdiff,"%u,%u,%u,%u\n",(outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
@@ -627,7 +627,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output123,"%f,%s,", TimeInterval, strdate);
+                        fprintf(output123,"%s,", strdate);
                         fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][0] & 0x000000ff),(outputList123[i][0] & 0x0000ff00) >> 8,(outputList123[i][0] & 0x00ff0000) >> 16,(outputList123[i][0] & 0xff000000) >> 24);
                         fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][1] & 0x000000ff),(outputList123[i][1] & 0x0000ff00) >> 8,(outputList123[i][1] & 0x00ff0000) >> 16,(outputList123[i][1] & 0xff000000) >> 24);
                         fprintf(output123,"%u,%u,%u,%u\n",(outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
@@ -648,7 +648,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output123diff,"%f,%s,", TimeInterval, strdate);
+                        fprintf(output123diff,"%s,", strdate);
                         fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][0] & 0x000000ff),(outputDiffList123[i][0] & 0x0000ff00) >> 8,(outputDiffList123[i][0] & 0x00ff0000) >> 16,(outputDiffList123[i][0] & 0xff000000) >> 24);
                         fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][1] & 0x000000ff),(outputDiffList123[i][1] & 0x0000ff00) >> 8,(outputDiffList123[i][1] & 0x00ff0000) >> 16,(outputDiffList123[i][1] & 0xff000000) >> 24);
                         fprintf(output123diff,"%u,%u,%u,%u\n",(outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
@@ -683,7 +683,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output124,"%f,%s,", TimeInterval, strdate);
+                        fprintf(output124,"%s,", strdate);
                         fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][0] & 0x000000ff),(outputList124[i][0] & 0x0000ff00) >> 8,(outputList124[i][0] & 0x00ff0000) >> 16,(outputList124[i][0] & 0xff000000) >> 24);
                         fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][1] & 0x000000ff),(outputList124[i][1] & 0x0000ff00) >> 8,(outputList124[i][1] & 0x00ff0000) >> 16,(outputList124[i][1] & 0xff000000) >> 24);
                         fprintf(output124,"%u,%u,%u,%u\n",(outputList124[i][2]>>16), ((outputList124[i][2]<<16)>>16),outputList124[i][3], outputList124[i][4]);
@@ -705,7 +705,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output124diff,"%f,%s,", TimeInterval, strdate);
+                        fprintf(output124diff,"%s,", strdate);
                         fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][0] & 0x000000ff),(outputDiffList124[i][0] & 0x0000ff00) >> 8,(outputDiffList124[i][0] & 0x00ff0000) >> 16,(outputDiffList124[i][0] & 0xff000000) >> 24);
                         fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][1] & 0x000000ff),(outputDiffList124[i][1] & 0x0000ff00) >> 8,(outputDiffList124[i][1] & 0x00ff0000) >> 16,(outputDiffList124[i][1] & 0xff000000) >> 24);
                         fprintf(output124diff,"%u,%u,%u,%u\n",(outputDiffList124[i][2]>>16), ((outputDiffList124[i][2]<<16)>>16),outputDiffList124[i][3], outputDiffList124[i][4]);
@@ -738,7 +738,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputIpsrc,"%f,%s,", TimeInterval, strdate);
+                        fprintf(outputIpsrc,"%s,", strdate);
                         fprintf(outputIpsrc,"\"%u.%u.%u.%u\",",(outputListIPSRC[i][0] & 0x000000ff),(outputListIPSRC[i][0] & 0x0000ff00) >> 8,(outputListIPSRC[i][0] & 0x00ff0000) >> 16,(outputListIPSRC[i][0] & 0xff000000) >> 24);
                         fprintf(outputIpsrc,"%d,%d\n",outputListIPSRC[i][1], outputListIPSRC[i][1]);
                     }
@@ -759,7 +759,7 @@ static void PreprocFunction(Packet *p,void *context)
                         // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                         tmlocal = localtime(&LastLogTime);
                         strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputIpsrcdiff,"%f,%s,", TimeInterval, strdate);
+                        fprintf(outputIpsrcdiff,"%s,", strdate);
                         fprintf(outputIpsrcdiff,"\"%u.%u.%u.%u\",",(outputDiffListIPSRC[i][0] & 0x000000ff),(outputDiffListIPSRC[i][0] & 0x0000ff00) >> 8,(outputDiffListIPSRC[i][0] & 0x00ff0000) >> 16,(outputDiffListIPSRC[i][0] & 0xff000000) >> 24);
                         fprintf(outputIpsrcdiff,"%d,%d\n",outputDiffListIPSRC[i][1], outputDiffListIPSRC[i][2]);
                     }
