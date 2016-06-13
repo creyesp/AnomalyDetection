@@ -44,7 +44,8 @@ VGT_type *vgtIPDST, *vgt_oldIPDST;
 
 
 FILE *fptr,*file2, *dataflow;
-time_t LastLogTime, CurrentTime, LastPktTime;
+time_t LastLogTime, CurrentTime;
+clock_t start_t, end_t, total_t;
 int countpaket;
 
 
@@ -360,9 +361,13 @@ static void addCGT(Packet *p)
             inet_ntop(AF_INET,&p->iph->ip_src,iphs,INET_ADDRSTRLEN);
             inet_ntop(AF_INET,&p->iph->ip_dst,iphd,INET_ADDRSTRLEN);
             time( &timestampDF );
-            difftime_pkt = difftime( &CurrentTime, &LastPktTime );
             tmlocal = localtime(&timestampDF);
             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+
+            start_t = clock();
+            difftime_pkt = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+            end_t = clock();
+            
             if(p->tcph != NULL){
                 fprintf(dataflow,"%f,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
@@ -431,7 +436,7 @@ static long long ComputeThresh(CGT_type *cgt)
     qsort(count, pc->hashtest, sizeof(long long), compare);
     thresh =  (long long)(pc->phi*count[(int)pc->hashtest/2]);
     LogMessage("#packet CGT.count: %lld | Thresh: %lld \n",cgt->count, thresh);
-    return thresh;
+    return (thresh > 1 ? thresh:1);
 }
 
 static long long ComputeDiffThresh(CGT_type *cgt)
@@ -492,7 +497,6 @@ static void PreprocFunction(Packet *p,void *context)
             time( &LastLogTime );
             fprintf(file2,"Date,Ipsrc,Ipdst,Ps,Pd,#Packets,AVGSize\n");
             time( &CurrentTime );
-            time( &LastPktTime );
             LogMessage("%s",ctime(&CurrentTime));
             TimeInterval = difftime(CurrentTime,LastLogTime);
             while(TimeInterval > pc->GatherTime){
@@ -505,6 +509,7 @@ static void PreprocFunction(Packet *p,void *context)
         }
         fclose(file2);
         flag=1;
+        end_t = clock();
     }
     time( &CurrentTime );
     TimeInterval = difftime(CurrentTime,LastLogTime);
@@ -653,12 +658,10 @@ static void PreprocFunction(Packet *p,void *context)
         addCGT(p); //agrega el nuevo paquete a la estructura
         // PREPROC_PROFILE_END(ad_perf_stats);
         countpaket=0;
-        time( &LastPktTime );
     }
     else{
         addCGT(p);
         countpaket++;
-        time( &LastPktTime );
     } 
 }
 
