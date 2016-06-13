@@ -316,7 +316,7 @@ static void addCGT(Packet *p)
     char iphs[INET_ADDRSTRLEN];
     char iphd[INET_ADDRSTRLEN];
 
-    time_t timestampDF, timestampDF_old;
+    time_t timestampDF;
     struct tm* tmlocal;
     char strdate[200];
     float difftime_pkt;
@@ -372,7 +372,7 @@ static void addCGT(Packet *p)
                 fprintf(dataflow,"%lf,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,%04u\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto, p->tcph->th_flags);
             }
             else{
-                fprintf(dataflow,"%lf,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%0  3u,-0001\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            
+                fprintf(dataflow,"%lf,%s,\"%s\",%u,\"%s\",%u,%06u,%06u,%u,%u,%u,%03u,-0001\n",difftime_pkt ,strdate, iphs, p->iph->ip_src, iphd, p->iph->ip_dst, p->sp, p->dp, p->dsize, p->pkth->pktlen, p->iph->ip_len, p->iph->ip_proto);            
             }
         }
             
@@ -485,7 +485,7 @@ static void PreprocFunction(Packet *p,void *context)
     int i,nlist,ndifflist;
     struct tm* tmlocal;
     char strdate[200];
-    FILE *outputFULLdiff, *outputFULL, *output123, *output123diff, *output124, *output124diff, *outputIpsrc, *outputIpsrcdiff. *outputIpdst, *outputIpdstdiff; 
+    FILE *outputFULLdiff, *outputFULL, *output123, *output123diff, *output124, *output124diff, *outputIpsrc, *outputIpsrcdiff, *outputIpdst, *outputIpdstdiff; 
 
     
 
@@ -521,16 +521,16 @@ static void PreprocFunction(Packet *p,void *context)
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
-            outputFULL = fopen('/var/log/snort/outputFULL.txt',"a");
-            outputFULLdiff = fopen('/var/log/snort/outputFULLdiff.txt',"a");
-            output123 = fopen('/var/log/snort/output123.txt',"a");
-            output123diff = fopen('/var/log/snort/output123diff.txt',"a");
-            output124 = fopen('/var/log/snort/output124.txt',"a");
-            output124diff = fopen('/var/log/snort/output124diff.txt',"a");
-            outputIpsrc = fopen('/var/log/snort/outputIpsrc.txt',"a");
-            outputIpsrcdiff = fopen('/var/log/snort/outputIpsrcdiff.txt',"a")
-            outputIpdst = fopen('/var/log/snort/outputIpdst.txt',"a");
-            outputIpdstdiff = fopen('/var/log/snort/outputIpdstdiff.txt',"a")
+            outputFULL = fopen("/var/log/snort/outputFULL.txt","a");
+            outputFULLdiff = fopen("/var/log/snort/outputFULLdiff.txt","a");
+            output123 = fopen("/var/log/snort/output123.txt","a");
+            output123diff = fopen("/var/log/snort/output123diff.txt","a");
+            output124 = fopen("/var/log/snort/output124.txt","a");
+            output124diff = fopen("/var/log/snort/output124diff.txt","a");
+            outputIpsrc = fopen("/var/log/snort/outputIpsrc.txt","a");
+            outputIpsrcdiff = fopen("/var/log/snort/outputIpsrcdiff.txt","a");
+            outputIpdst = fopen("/var/log/snort/outputIpdst.txt","a");
+            outputIpdstdiff = fopen("/var/log/snort/outputIpdstdiff.txt","a");
 
             //SaveToLog(LastLogTime); //save in the log file the current count data
             LogMessage("\n************************************************************************\n");
@@ -637,7 +637,7 @@ static void PreprocFunction(Packet *p,void *context)
             fclose(output123);
 
             outputDiffList123 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old)); 
-            if ( output123iff != NULL)
+            if ( output123diff != NULL)
             {
                 if(outputDiffList123 != NULL){
                     LogMessage("Numero de salidas: %d\n",outputDiffList123[0][0]-1);
@@ -731,8 +731,8 @@ static void PreprocFunction(Packet *p,void *context)
             if ( outputIpsrc != NULL)
             {
                 if(outputListIPSRC != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputListIPSRC[0]-1);
-                    for(i=1; i < outputListIPSRC[0]; i++)
+                    LogMessage("Numero de salidas: %d\n",outputListIPSRC[0][0]-1);
+                    for(i=1; i < outputListIPSRC[0][0]; i++)
                     {
                         // LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
                         // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
