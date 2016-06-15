@@ -465,6 +465,60 @@ static time_t increaseTime(time_t timec, int delta){
     tm->tm_sec += delta;
     return mktime(tm);
 }
+
+void writeOutput96( FILE* outputfile, char[] outputname, unsigned int ** outputList ){
+    char dest[50];
+    struct tm* tmlocal;
+    char strdate[200];
+
+    sprintf(dest,"/var/log/snort/%s.csv",outputname)
+    outputfile = fopen(dest,"a");
+    
+    if ( outputfile != NULL)
+    {
+        if(outputList != NULL){
+            for(i=1; i < outputList[0][0]; i++)
+            {
+                // LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
+                // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
+                tmlocal = localtime(&LastLogTime);
+                strftime(strdate, 200, "\"%x %X\"", tmlocal);
+                fprintf(outputFULL,"%s," ,strdate);
+                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                fprintf(outputFULL,"%05u,%05u,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            }
+        }
+    }
+    fclose(outputfile); 
+}
+
+void writeOutput( FILE* outputfile, char[] outputname, unsigned int ** outputList ){
+    char dest[50];
+    struct tm* tmlocal;
+    char strdate[200];
+
+    sprintf(dest,"/var/log/snort/%s.csv",outputname)
+    outputfile = fopen(dest,"a");
+    
+    if ( outputfile != NULL)
+    {
+        if(outputList != NULL){
+            for(i=1; i < outputList[0][0]; i++)
+            {
+                // LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
+                // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
+                tmlocal = localtime(&LastLogTime);
+                strftime(strdate, 200, "\"%x %X\"", tmlocal);
+                fprintf(outputFULL,"%s," ,strdate);
+                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                fprintf(outputFULL,"%d,%d\n",outputList[i][1], outputList[i][2]);
+            }
+        }
+    }
+    fclose(outputfile); 
+}
+
 /* Function: PreprocFunction(Packet *)
  *
  * Purpose: Main preprocessor function. Aalerts and logs are generated here.
@@ -483,9 +537,9 @@ static void PreprocFunction(Packet *p,void *context)
     unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputDiffListIPSRC;
     double TimeInterval;
     int i,nlist,ndifflist;
-    struct tm* tmlocal;
-    char strdate[200];
-    FILE *outputFULLdiff, *outputFULL, *output123, *output123diff, *output124, *output124diff, *outputIpsrc, *outputIpsrcdiff, *outputIpdst, *outputIpdstdiff; 
+    // struct tm* tmlocal;
+    // char strdate[200];
+    FILE *outputfileFULLdiff, *outputfileFULL, *outputfile123, *outputfile123diff, *outputfile124, *outputfile124diff, *outputfileIpsrc, *outputfileIpsrcdiff, *outputfileIpdst, *outputfileIpdstdiff; 
 
     
 
@@ -521,14 +575,14 @@ static void PreprocFunction(Packet *p,void *context)
 
         if (pc->nlog) //if flag "log" is set in config file, preprocessor will log stats to file
         {
-            outputFULL = fopen("/var/log/snort/outputFULL.txt","a");
-            outputFULLdiff = fopen("/var/log/snort/outputFULLdiff.txt","a");
-            output123 = fopen("/var/log/snort/output123.txt","a");
-            output123diff = fopen("/var/log/snort/output123diff.txt","a");
-            output124 = fopen("/var/log/snort/output124.txt","a");
-            output124diff = fopen("/var/log/snort/output124diff.txt","a");
-            outputIpsrc = fopen("/var/log/snort/outputIpsrc.txt","a");
-            outputIpsrcdiff = fopen("/var/log/snort/outputIpsrcdiff.txt","a");
+            // outputFULL = fopen("/var/log/snort/outputFULL.txt","a");
+            // outputFULLdiff = fopen("/var/log/snort/outputFULLdiff.txt","a");
+            // output123 = fopen("/var/log/snort/output123.txt","a");
+            // output123diff = fopen("/var/log/snort/output123diff.txt","a");
+            // output124 = fopen("/var/log/snort/output124.txt","a");
+            // output124diff = fopen("/var/log/snort/output124diff.txt","a");
+            // outputIpsrc = fopen("/var/log/snort/outputIpsrc.txt","a");
+            // outputIpsrcdiff = fopen("/var/log/snort/outputIpsrcdiff.txt","a");
             // outputIpdst = fopen("/var/log/snort/outputIpdst.txt","a");
             // outputIpdstdiff = fopen("/var/log/snort/outputIpdstdiff.txt","a");
 
@@ -537,29 +591,31 @@ static void PreprocFunction(Packet *p,void *context)
             LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
             LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
             LogMessage("=================  IPsrc IPdst Psrc Pdst Packets Dsize  =================  \n");
-            outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt));            
-            if ( outputFULL != NULL)
-            {
-                if(outputList != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
-                    for(i=1; i < outputList[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputFULL,"%s," ,strdate);
-                        fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        fprintf(outputFULL,"%u,%u,%u,%u\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                    }
-                }
-            }
-            fclose(outputFULL);
+            outputList = CGT_Output96(cgt, vgt, ComputeThresh(cgt)); 
+            writeOutput96(outputfileFULL,"outputFull",outputList);
+            // if ( outputFULL != NULL)
+            // {
+            //     if(outputList != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputList[0][0]-1);
+            //         for(i=1; i < outputList[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(outputFULL,"%s," ,strdate);
+            //             fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+            //             fprintf(outputFULL,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+            //             fprintf(outputFULL,"%u,%u,%u,%u\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(outputFULL);
 
 
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
+            writeOutput96(outputfileDiffFULL,"outputDiffFull",outputDiffList);
             // if(outputDiffList != NULL){
             //     LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
             //     for(i=1; i < outputDiffList[0][0]; i++)
@@ -569,25 +625,25 @@ static void PreprocFunction(Packet *p,void *context)
             //         LogMessage(" portSrc %5u portDst %5u packet %d size %d\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3],outputDiffList[i][4]);
             //     }
             // } 
-            if ( outputFULLdiff != NULL)
-            {
-                if(outputDiffList != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputDiffList[0][0]-1);
-                    for(i=1; i < outputDiffList[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputFULLdiff,"%s,", strdate);
-                        fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
-                        fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
-                        fprintf(outputFULLdiff,"%u,%u,%u,%u\n",(outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
-                    }
-                }
-            }
-            fclose(outputFULLdiff);
+            // if ( outputFULLdiff != NULL)
+            // {
+            //     if(outputDiffList != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputDiffList[0][0]-1);
+            //         for(i=1; i < outputDiffList[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(outputFULLdiff,"%s,", strdate);
+            //             fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][0] & 0x000000ff),(outputDiffList[i][0] & 0x0000ff00) >> 8,(outputDiffList[i][0] & 0x00ff0000) >> 16,(outputDiffList[i][0] & 0xff000000) >> 24);
+            //             fprintf(outputFULLdiff,"\"%u.%u.%u.%u\",",(outputDiffList[i][1] & 0x000000ff),(outputDiffList[i][1] & 0x0000ff00) >> 8,(outputDiffList[i][1] & 0x00ff0000) >> 16,(outputDiffList[i][1] & 0xff000000) >> 24);
+            //             fprintf(outputFULLdiff,"%u,%u,%u,%u\n",(outputDiffList[i][2]>>16), ((outputDiffList[i][2]<<16)>>16),outputDiffList[i][3], outputDiffList[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(outputFULLdiff);
 
             CGT_Destroy(cgt_old);
             VGT_Destroy(vgt_old);
@@ -616,46 +672,48 @@ static void PreprocFunction(Packet *p,void *context)
 
             LogMessage("=================   IPsrc IPdst Psrc  - Packets Dsize  =================  \n");
             outputList123 = CGT_Output96(cgt123, vgt123, ComputeThresh(cgt123));
-            if ( output123 != NULL)
-            {
-                if(outputList123 != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputList123[0][0]-1);
-                    for(i=1; i < outputList123[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList123[i][0] & 0x000000ff),(outputList123[i][0] & 0x0000ff00) >> 8,(outputList123[i][0] & 0x00ff0000) >> 16,(outputList123[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList123[i][1] & 0x000000ff),(outputList123[i][1] & 0x0000ff00) >> 8,(outputList123[i][1] & 0x00ff0000) >> 16,(outputList123[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output123,"%s,", strdate);
-                        fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][0] & 0x000000ff),(outputList123[i][0] & 0x0000ff00) >> 8,(outputList123[i][0] & 0x00ff0000) >> 16,(outputList123[i][0] & 0xff000000) >> 24);
-                        fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][1] & 0x000000ff),(outputList123[i][1] & 0x0000ff00) >> 8,(outputList123[i][1] & 0x00ff0000) >> 16,(outputList123[i][1] & 0xff000000) >> 24);
-                        fprintf(output123,"%u,%u,%u,%u\n",(outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
-                    }
-                }
-            }
-            fclose(output123);
+            writeOutput96(outputfile123,"output123",outputList123);
+            // if ( output123 != NULL)
+            // {
+            //     if(outputList123 != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputList123[0][0]-1);
+            //         for(i=1; i < outputList123[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList123[i][0] & 0x000000ff),(outputList123[i][0] & 0x0000ff00) >> 8,(outputList123[i][0] & 0x00ff0000) >> 16,(outputList123[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList123[i][1] & 0x000000ff),(outputList123[i][1] & 0x0000ff00) >> 8,(outputList123[i][1] & 0x00ff0000) >> 16,(outputList123[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(output123,"%s,", strdate);
+            //             fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][0] & 0x000000ff),(outputList123[i][0] & 0x0000ff00) >> 8,(outputList123[i][0] & 0x00ff0000) >> 16,(outputList123[i][0] & 0xff000000) >> 24);
+            //             fprintf(output123,"\"%u.%u.%u.%u\",",(outputList123[i][1] & 0x000000ff),(outputList123[i][1] & 0x0000ff00) >> 8,(outputList123[i][1] & 0x00ff0000) >> 16,(outputList123[i][1] & 0xff000000) >> 24);
+            //             fprintf(output123,"%u,%u,%u,%u\n",(outputList123[i][2]>>16), ((outputList123[i][2]<<16)>>16),outputList123[i][3], outputList123[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(output123);
 
             outputDiffList123 = CGT_Output96(cgt123_old, vgt123_old, ComputeDiffThresh(cgt123_old)); 
-            if ( output123diff != NULL)
-            {
-                if(outputDiffList123 != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputDiffList123[0][0]-1);
-                    for(i=1; i < outputDiffList123[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList123[i][0] & 0x000000ff),(outputDiffList123[i][0] & 0x0000ff00) >> 8,(outputDiffList123[i][0] & 0x00ff0000) >> 16,(outputDiffList123[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList123[i][1] & 0x000000ff),(outputDiffList123[i][1] & 0x0000ff00) >> 8,(outputDiffList123[i][1] & 0x00ff0000) >> 16,(outputDiffList123[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output123diff,"%s,", strdate);
-                        fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][0] & 0x000000ff),(outputDiffList123[i][0] & 0x0000ff00) >> 8,(outputDiffList123[i][0] & 0x00ff0000) >> 16,(outputDiffList123[i][0] & 0xff000000) >> 24);
-                        fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][1] & 0x000000ff),(outputDiffList123[i][1] & 0x0000ff00) >> 8,(outputDiffList123[i][1] & 0x00ff0000) >> 16,(outputDiffList123[i][1] & 0xff000000) >> 24);
-                        fprintf(output123diff,"%u,%u,%u,%u\n",(outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
-                    }
-                }
-            }
-            fclose(output123diff);
+            writeOutput96(outputfile123diff,"output123diff",outputDiffList123);
+            // if ( output123diff != NULL)
+            // {
+            //     if(outputDiffList123 != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputDiffList123[0][0]-1);
+            //         for(i=1; i < outputDiffList123[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputDiffList123[i][0] & 0x000000ff),(outputDiffList123[i][0] & 0x0000ff00) >> 8,(outputDiffList123[i][0] & 0x00ff0000) >> 16,(outputDiffList123[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputDiffList123[i][1] & 0x000000ff),(outputDiffList123[i][1] & 0x0000ff00) >> 8,(outputDiffList123[i][1] & 0x00ff0000) >> 16,(outputDiffList123[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(output123diff,"%s,", strdate);
+            //             fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][0] & 0x000000ff),(outputDiffList123[i][0] & 0x0000ff00) >> 8,(outputDiffList123[i][0] & 0x00ff0000) >> 16,(outputDiffList123[i][0] & 0xff000000) >> 24);
+            //             fprintf(output123diff,"\"%u.%u.%u.%u\",",(outputDiffList123[i][1] & 0x000000ff),(outputDiffList123[i][1] & 0x0000ff00) >> 8,(outputDiffList123[i][1] & 0x00ff0000) >> 16,(outputDiffList123[i][1] & 0xff000000) >> 24);
+            //             fprintf(output123diff,"%u,%u,%u,%u\n",(outputDiffList123[i][2]>>16), ((outputDiffList123[i][2]<<16)>>16),outputDiffList123[i][3], outputDiffList123[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(output123diff);
 
 
             CGT_Destroy(cgt123_old);
@@ -672,47 +730,48 @@ static void PreprocFunction(Packet *p,void *context)
 
             LogMessage("=================  IPsrc IPdst - Pdst Packets Dsize  =================  \n");
             outputList124 = CGT_Output96(cgt124, vgt124, ComputeThresh(cgt124));
-            if ( output124 != NULL)
-            {
-                if(outputList124 != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputList124[0][0]-1);
-                    for(i=1; i < outputList124[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output124,"%s,", strdate);
-                        fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][0] & 0x000000ff),(outputList124[i][0] & 0x0000ff00) >> 8,(outputList124[i][0] & 0x00ff0000) >> 16,(outputList124[i][0] & 0xff000000) >> 24);
-                        fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][1] & 0x000000ff),(outputList124[i][1] & 0x0000ff00) >> 8,(outputList124[i][1] & 0x00ff0000) >> 16,(outputList124[i][1] & 0xff000000) >> 24);
-                        fprintf(output124,"%u,%u,%u,%u\n",(outputList124[i][2]>>16), ((outputList124[i][2]<<16)>>16),outputList124[i][3], outputList124[i][4]);
-                    }
-                }
-            }
-            fclose(output124);
+            writeOutput96(outputfile124,"output124",outputList124);
+            // if ( output124 != NULL)
+            // {
+            //     if(outputList124 != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputList124[0][0]-1);
+            //         for(i=1; i < outputList124[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(output124,"%s,", strdate);
+            //             fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][0] & 0x000000ff),(outputList124[i][0] & 0x0000ff00) >> 8,(outputList124[i][0] & 0x00ff0000) >> 16,(outputList124[i][0] & 0xff000000) >> 24);
+            //             fprintf(output124,"\"%u.%u.%u.%u\",",(outputList124[i][1] & 0x000000ff),(outputList124[i][1] & 0x0000ff00) >> 8,(outputList124[i][1] & 0x00ff0000) >> 16,(outputList124[i][1] & 0xff000000) >> 24);
+            //             fprintf(output124,"%u,%u,%u,%u\n",(outputList124[i][2]>>16), ((outputList124[i][2]<<16)>>16),outputList124[i][3], outputList124[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(output124);
 
             outputDiffList124 = CGT_Output96(cgt124_old, vgt124_old, ComputeDiffThresh(cgt124_old));    
-
-            if ( output124diff != NULL)
-            {
-                if(outputDiffList124 != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputDiffList124[0][0]-1);
-                    for(i=1; i < outputDiffList124[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(output124diff,"%s,", strdate);
-                        fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][0] & 0x000000ff),(outputDiffList124[i][0] & 0x0000ff00) >> 8,(outputDiffList124[i][0] & 0x00ff0000) >> 16,(outputDiffList124[i][0] & 0xff000000) >> 24);
-                        fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][1] & 0x000000ff),(outputDiffList124[i][1] & 0x0000ff00) >> 8,(outputDiffList124[i][1] & 0x00ff0000) >> 16,(outputDiffList124[i][1] & 0xff000000) >> 24);
-                        fprintf(output124diff,"%u,%u,%u,%u\n",(outputDiffList124[i][2]>>16), ((outputDiffList124[i][2]<<16)>>16),outputDiffList124[i][3], outputDiffList124[i][4]);
-                    }
-                }
-            }
-            fclose(output124diff);
+            writeOutput96(outputfile124diff,"output124diff",outputDiffList124);
+            // if ( output124diff != NULL)
+            // {
+            //     if(outputDiffList124 != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputDiffList124[0][0]-1);
+            //         for(i=1; i < outputDiffList124[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(output124diff,"%s,", strdate);
+            //             fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][0] & 0x000000ff),(outputDiffList124[i][0] & 0x0000ff00) >> 8,(outputDiffList124[i][0] & 0x00ff0000) >> 16,(outputDiffList124[i][0] & 0xff000000) >> 24);
+            //             fprintf(output124diff,"\"%u.%u.%u.%u\",",(outputDiffList124[i][1] & 0x000000ff),(outputDiffList124[i][1] & 0x0000ff00) >> 8,(outputDiffList124[i][1] & 0x00ff0000) >> 16,(outputDiffList124[i][1] & 0xff000000) >> 24);
+            //             fprintf(output124diff,"%u,%u,%u,%u\n",(outputDiffList124[i][2]>>16), ((outputDiffList124[i][2]<<16)>>16),outputDiffList124[i][3], outputDiffList124[i][4]);
+            //         }
+            //     }
+            // }
+            // fclose(output124diff);
 
             CGT_Destroy(cgt124_old);
             VGT_Destroy(vgt124_old);
@@ -727,45 +786,45 @@ static void PreprocFunction(Packet *p,void *context)
             
             LogMessage("=================  IPsrc Packets Dsize  =================  \n");
             outputListIPSRC = CGT_Output(cgtIPSRC, vgtIPSRC, ComputeThresh(cgtIPSRC));
-
-            if ( outputIpsrc != NULL)
-            {
-                if(outputListIPSRC != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputListIPSRC[0][0]-1);
-                    for(i=1; i < outputListIPSRC[0][0]; i++)
-                    {
-                        // LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
-                        // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputIpsrc,"%s,", strdate);
-                        fprintf(outputIpsrc,"\"%u.%u.%u.%u\",",(outputListIPSRC[i][0] & 0x000000ff),(outputListIPSRC[i][0] & 0x0000ff00) >> 8,(outputListIPSRC[i][0] & 0x00ff0000) >> 16,(outputListIPSRC[i][0] & 0xff000000) >> 24);
-                        fprintf(outputIpsrc,"%d,%d\n",outputListIPSRC[i][1], outputListIPSRC[i][1]);
-                    }
-                }
-            }
-            fclose(outputIpsrc);
+            writeOutput(outputIpsrc,"outputIpsrc",outputListIPSRC);            
+            // if ( outputIpsrc != NULL)
+            // {
+            //     if(outputListIPSRC != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputListIPSRC[0][0]-1);
+            //         for(i=1; i < outputListIPSRC[0][0]; i++)
+            //         {
+            //             // LogMessage("SORT  : %3u.%3u.%3u.%3u (%10u)# ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24,compresults[claimed][0]);
+            //             // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(outputIpsrc,"%s,", strdate);
+            //             fprintf(outputIpsrc,"\"%u.%u.%u.%u\",",(outputListIPSRC[i][0] & 0x000000ff),(outputListIPSRC[i][0] & 0x0000ff00) >> 8,(outputListIPSRC[i][0] & 0x00ff0000) >> 16,(outputListIPSRC[i][0] & 0xff000000) >> 24);
+            //             fprintf(outputIpsrc,"%d,%d\n",outputListIPSRC[i][1], outputListIPSRC[i][1]);
+            //         }
+            //     }
+            // }
+            // fclose(outputIpsrc);
 
             outputDiffListIPSRC = CGT_Output(cgt_oldIPSRC, vgt_oldIPSRC, ComputeDiffThresh(cgt_oldIPSRC));  
-
-            if ( outputIpsrcdiff != NULL)
-            {
-                if(outputDiffListIPSRC != NULL){
-                    LogMessage("Numero de salidas: %d\n",outputDiffListIPSRC[0][0]-1);
-                    for(i=1; i < outputDiffListIPSRC[0][0]; i++)
-                    {
-                        // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                        // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                        tmlocal = localtime(&LastLogTime);
-                        strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                        fprintf(outputIpsrcdiff,"%s,", strdate);
-                        fprintf(outputIpsrcdiff,"\"%u.%u.%u.%u\",",(outputDiffListIPSRC[i][0] & 0x000000ff),(outputDiffListIPSRC[i][0] & 0x0000ff00) >> 8,(outputDiffListIPSRC[i][0] & 0x00ff0000) >> 16,(outputDiffListIPSRC[i][0] & 0xff000000) >> 24);
-                        fprintf(outputIpsrcdiff,"%d,%d\n",outputDiffListIPSRC[i][1], outputDiffListIPSRC[i][2]);
-                    }
-                }
-            }
-            fclose(outputIpsrcdiff);  
+            writeOutput(outputIpsrcdiff,"outputIpsrcdiff",outputDiffListIPSRC);            
+            // if ( outputIpsrcdiff != NULL)
+            // {
+            //     if(outputDiffListIPSRC != NULL){
+            //         LogMessage("Numero de salidas: %d\n",outputDiffListIPSRC[0][0]-1);
+            //         for(i=1; i < outputDiffListIPSRC[0][0]; i++)
+            //         {
+            //             // LogMessage("CANDIDATO ==> ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+            //             // LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+            //             // LogMessage(" portSrc %5u portDst %5u packet %u size %u\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            //             tmlocal = localtime(&LastLogTime);
+            //             strftime(strdate, 200, "\"%x %X\"", tmlocal);
+            //             fprintf(outputIpsrcdiff,"%s,", strdate);
+            //             fprintf(outputIpsrcdiff,"\"%u.%u.%u.%u\",",(outputDiffListIPSRC[i][0] & 0x000000ff),(outputDiffListIPSRC[i][0] & 0x0000ff00) >> 8,(outputDiffListIPSRC[i][0] & 0x00ff0000) >> 16,(outputDiffListIPSRC[i][0] & 0xff000000) >> 24);
+            //             fprintf(outputIpsrcdiff,"%d,%d\n",outputDiffListIPSRC[i][1], outputDiffListIPSRC[i][2]);
+            //         }
+            //     }
+            // }
+            // fclose(outputIpsrcdiff);  
 
             CGT_Destroy(cgt_oldIPSRC);
             VGT_Destroy(vgt_oldIPSRC);
@@ -780,7 +839,10 @@ static void PreprocFunction(Packet *p,void *context)
             
             LogMessage("=================  IPdst Packets Dsize  =================  \n");
             outputListIPSRC = CGT_Output(cgtIPDST, vgtIPDST, ComputeThresh(cgtIPDST));
+            writeOutput(outputfileIpdst,"outputIpdst",outputListIPSRC);            
             outputDiffListIPSRC = CGT_Output(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
+            writeOutput(outputfileIpdstdiff,"outputIpdstdiff",outputDiffListIPSRC);            
+
 
             CGT_Destroy(cgt_oldIPDST);
             VGT_Destroy(vgt_oldIPDST);
