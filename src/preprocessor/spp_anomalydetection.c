@@ -494,7 +494,7 @@ void writeOutput96( FILE* outputfile, char outputname[], unsigned int ** outputL
     fclose(outputfile); 
 }
 
-void writeOutput( FILE* outputfile, char[] outputname, unsigned int ** outputList ){
+void writeOutput( FILE* outputfile, char outputname[], unsigned int ** outputList ){
     char dest[50];
     struct tm* tmlocal;
     char strdate[200];
