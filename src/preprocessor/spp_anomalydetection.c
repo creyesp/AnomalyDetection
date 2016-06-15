@@ -498,6 +498,7 @@ void writeOutput( FILE* outputfile, char outputname[], unsigned int ** outputLis
     char dest[50];
     struct tm* tmlocal;
     char strdate[200];
+    int i;
 
     sprintf(dest,"/var/log/snort/%s.csv",outputname);
     outputfile = fopen(dest,"a");
@@ -616,7 +617,7 @@ static void PreprocFunction(Packet *p,void *context)
 
 
             outputDiffList = CGT_Output96(cgt_old, vgt_old, ComputeDiffThresh(cgt_old));
-            writeOutput96(outputfileDiffFULL,"outputDiffFull",outputDiffList);
+            writeOutput96(outputfileFULLdiff,"outputDiffFull",outputDiffList);
             // if(outputDiffList != NULL){
             //     LogMessage("Numero de salidas DIFF: %d\n",outputDiffList[0][0]-1);
             //     for(i=1; i < outputDiffList[0][0]; i++)
@@ -787,7 +788,7 @@ static void PreprocFunction(Packet *p,void *context)
             
             LogMessage("=================  IPsrc Packets Dsize  =================  \n");
             outputListIPSRC = CGT_Output(cgtIPSRC, vgtIPSRC, ComputeThresh(cgtIPSRC));
-            writeOutput(outputIpsrc,"outputIpsrc",outputListIPSRC);            
+            writeOutput(outputfileIpsrc,"outputIpsrc",outputListIPSRC);            
             // if ( outputIpsrc != NULL)
             // {
             //     if(outputListIPSRC != NULL){
@@ -807,7 +808,7 @@ static void PreprocFunction(Packet *p,void *context)
             // fclose(outputIpsrc);
 
             outputDiffListIPSRC = CGT_Output(cgt_oldIPSRC, vgt_oldIPSRC, ComputeDiffThresh(cgt_oldIPSRC));  
-            writeOutput(outputIpsrcdiff,"outputIpsrcdiff",outputDiffListIPSRC);            
+            writeOutput(outputfileIpsrcdiff,"outputIpsrcdiff",outputDiffListIPSRC);            
             // if ( outputIpsrcdiff != NULL)
             // {
             //     if(outputDiffListIPSRC != NULL){
