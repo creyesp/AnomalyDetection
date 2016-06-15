@@ -466,12 +466,13 @@ static time_t increaseTime(time_t timec, int delta){
     return mktime(tm);
 }
 
-void writeOutput96( FILE* outputfile, char[] outputname, unsigned int ** outputList ){
+void writeOutput96( FILE* outputfile, char outputname[], unsigned int ** outputList ){
     char dest[50];
     struct tm* tmlocal;
     char strdate[200];
+    int i;
 
-    sprintf(dest,"/var/log/snort/%s.csv",outputname)
+    sprintf(dest,"/var/log/snort/%s.csv",outputname);
     outputfile = fopen(dest,"a");
     
     if ( outputfile != NULL)
@@ -483,10 +484,10 @@ void writeOutput96( FILE* outputfile, char[] outputname, unsigned int ** outputL
                 // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
                 tmlocal = localtime(&LastLogTime);
                 strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                fprintf(outputFULL,"%s," ,strdate);
-                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                fprintf(outputFULL,"%05u,%05u,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                fprintf(outputfile,"%s," ,strdate);
+                fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                fprintf(outputfile,"%05u,%05u,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
             }
         }
     }
@@ -498,7 +499,7 @@ void writeOutput( FILE* outputfile, char[] outputname, unsigned int ** outputLis
     struct tm* tmlocal;
     char strdate[200];
 
-    sprintf(dest,"/var/log/snort/%s.csv",outputname)
+    sprintf(dest,"/var/log/snort/%s.csv",outputname);
     outputfile = fopen(dest,"a");
     
     if ( outputfile != NULL)
@@ -510,9 +511,9 @@ void writeOutput( FILE* outputfile, char[] outputname, unsigned int ** outputLis
                 // LogMessage("%10d | %10d\n", compresults[claimed][1],compresults[claimed][2]);
                 tmlocal = localtime(&LastLogTime);
                 strftime(strdate, 200, "\"%x %X\"", tmlocal);
-                fprintf(outputFULL,"%s," ,strdate);
-                fprintf(outputFULL,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
-                fprintf(outputFULL,"%d,%d\n",outputList[i][1], outputList[i][2]);
+                fprintf(outputfile,"%s," ,strdate);
+                fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                fprintf(outputfile,"%d,%d\n",outputList[i][1], outputList[i][2]);
             }
         }
     }
