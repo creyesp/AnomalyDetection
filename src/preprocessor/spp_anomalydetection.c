@@ -46,9 +46,9 @@ VGT_type *vgtIPSD, *vgt_oldIPSD;
 
 FILE *fptr,*file2, *dataflow;
 FILE *outputIPsdPORTsd, *outputIPsdPORTs, *outputIPsdPORTd, *outputIPsd, 
-     *outputfileIPs, *outputIPd;
+     *outputIPs, *outputIPd;
 FILE *outputIPsdPORTsd_diff, *outputIPsdPORTs_diff, *outputIPsdPORTd_diff, *outputIPsd_diff, 
-     *outputfileIPs_diff, *outputIPd_diff;
+     *outputIPs_diff, *outputIPd_diff;
 
 time_t LastLogTime, CurrentTime;
 int countpaket;
@@ -231,7 +231,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
         outputIPsd == NULL || outputIPs == NULL || outputIPd == NULL || outputIPsdPORTsd_diff == NULL ||
         outputIPsdPORTs_diff == NULL || outputIPsdPORTd_diff == NULL || outputIPsd_diff == NULL ||
         outputIPs_diff == NULL || outputIPd_diff == NULL)
-        FatalError("AnomalyDetection log file '%s' could not be opened: %s.\n")
+        FatalError("AnomalyDetection log file could not be opened.\n")
     else 
         LogMessage("AnomalyDetection: Logs files opened.\n");
 
@@ -387,9 +387,9 @@ static void addCGT(Packet *p)
             VGT_Update(vgt_oldIPDST, ipdst, -1*packetsize);  
 
             CGT_Update96(cgtIPSD, ipsrc,ipdst, 0, 0, packetsize,(int)p->dsize);
-            CGT_Update96(cgtIPSD_old, ipsrc,ipdst, 0, 0, -1*packetsize,-1*(int)p->dsize); 
+            CGT_Update96(cgt_oldIPSD, ipsrc,ipdst, 0, 0, -1*packetsize,-1*(int)p->dsize); 
             VGT_Update96(vgtIPSD, ipsrc,ipdst, 0, 0, packetsize); 
-            VGT_Update96(vgtIPSD_old, ipsrc,ipdst, 0, 0, -1*packetsize);
+            VGT_Update96(vgt_oldIPSD, ipsrc,ipdst, 0, 0, -1*packetsize);
         }
     }
        
@@ -500,7 +500,6 @@ static time_t increaseTime(time_t timec, int delta){
 }
 
 void writeOutput96( FILE* outputfile, unsigned int ** outputList ){
-    char dest[50];
     struct tm* tmlocal;
     char strdate[200];
     int i;
@@ -526,7 +525,6 @@ void writeOutput96( FILE* outputfile, unsigned int ** outputList ){
 }
 
 void writeOutput( FILE* outputfile, unsigned int ** outputList ){
-    char dest[50];
     struct tm* tmlocal;
     char strdate[200];
     int i;
@@ -536,7 +534,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList ){
         if(outputList != NULL){
             for(i=1; i < outputList[0][0]; i++)
             {
-                LogMessage("IP %3u.%3u.%3u.%3u", outputList[i][0]&0x000000ff,(outputList[i][0]&0x0000ff00)>>8,(outputList[i][0]&0x00ff0000)>>16,(outputList[i][0]&0xff000000)>>24,outputList[i][0]);
+                LogMessage("IP %3u.%3u.%3u.%3u", outputList[i][0]&0x000000ff,(outputList[i][0]&0x0000ff00)>>8,(outputList[i][0]&0x00ff0000)>>16,(outputList[i][0]&0xff000000)>>24);
                 LogMessage(" packets %d size %d\n", outputList[i][1],outputList[i][2]);
                 tmlocal = localtime(&LastLogTime);
                 strftime(strdate, 200, "\"%x %X\"", tmlocal);
@@ -592,7 +590,6 @@ static void PreprocFunction(Packet *p,void *context)
         }
         fclose(file2);
         flag=1;
-        end_t = clock();
     }
     time( &CurrentTime );
     TimeInterval = difftime(CurrentTime,LastLogTime);
