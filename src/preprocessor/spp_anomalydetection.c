@@ -231,7 +231,7 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
         outputIPsd == NULL || outputIPs == NULL || outputIPd == NULL || outputIPsdPORTsd_diff == NULL ||
         outputIPsdPORTs_diff == NULL || outputIPsdPORTd_diff == NULL || outputIPsd_diff == NULL ||
         outputIPs_diff == NULL || outputIPd_diff == NULL)
-        FatalError("AnomalyDetection log file could not be opened.\n")
+        FatalError("AnomalyDetection log file could not be opened.\n");
     else 
         LogMessage("AnomalyDetection: Logs files opened.\n");
 
@@ -666,7 +666,7 @@ static void PreprocFunction(Packet *p,void *context)
             cgtIPSD = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgtIPSD = VGT_Init(pc->groups,pc->hashtest);
             if(outputListIPSD != NULL) preprocFreeOutputList(outputListIPSD);
-            if(outputDiffListIPSD != NULL) preprocFreeOutputList(outputDiffListIPSD)
+            if(outputDiffListIPSD != NULL) preprocFreeOutputList(outputDiffListIPSD);
 
             LogMessage("=================  IPsrc Packets Dsize  =================  \n");
             

@@ -74,6 +74,12 @@ struct profile
 typedef struct _AnomalydetectionConfig     
 {
     char LogPath[100];
+    char LogPathIPsdPORTsd[100];
+    char LogPathIPsdPORTs[100];
+    char LogPathIPsdPORTd[100];
+    char LogPathIPsd[100];
+    char LogPathIPs[100];
+    char LogPathIPd[100];
     char ProfilePath[100];
     int nlog;
     int alert;
