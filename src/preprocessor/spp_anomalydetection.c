@@ -560,7 +560,7 @@ static void PreprocFunction(Packet *p,void *context)
     //CGT_type *cgt_aux;
     tSfPolicyId pid =  sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
-    unsigned int ** outputList, ** outputList123, ** outputList124, **outputListIPSRC; **outputListIPSD;
+    unsigned int ** outputList, ** outputList123, ** outputList124, **outputListIPSRC, **outputListIPSD;
     unsigned int ** outputDiffList, ** outputDiffList123, ** outputDiffList124, **outputDiffListIPSRC, **outputDiffListIPSD;
     double TimeInterval;
     int i,nlist,ndifflist;
@@ -656,13 +656,13 @@ static void PreprocFunction(Packet *p,void *context)
             
             outputListIPSD = CGT_Output96(cgtIPSD, vgtIPSD, ComputeThresh(cgtIPSD));
             writeOutput96(outputIPsd,outputListIPSD);
-            outputDiffListIPSD = CGT_Output96(cgtIPSD_old, vgtIPSD_old, ComputeDiffThresh(cgtIPSD_old));    
+            outputDiffListIPSD = CGT_Output96(cgt_oldIPSD, vgt_oldIPSD, ComputeDiffThresh(cgt_oldIPSD));    
             writeOutput96(outputIPsd_diff,outputDiffListIPSD);
             
-            CGT_Destroy(cgtIPSD_old);
-            VGT_Destroy(vgtIPSD_old);
-            cgtIPSD_old = cgtIPSD;
-            vgtIPSD_old = vgtIPSD;
+            CGT_Destroy(cgt_oldIPSD);
+            VGT_Destroy(vgt_oldIPSD);
+            cgt_oldIPSD = cgtIPSD;
+            vgt_oldIPSD = vgtIPSD;
             cgtIPSD = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
             vgtIPSD = VGT_Init(pc->groups,pc->hashtest);
             if(outputListIPSD != NULL) preprocFreeOutputList(outputListIPSD);
