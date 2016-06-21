@@ -508,6 +508,7 @@ void writeOutput96( FILE* outputfile, unsigned int ** outputList ){
     if ( outputfile != NULL)
     {
         if(outputList != NULL){
+            LogMessage("Numero de salidas: %d\n",outputList[0][0]);
             for(i=1; i < outputList[0][0]; i++)
             {
                 LogMessage("ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
@@ -520,8 +521,12 @@ void writeOutput96( FILE* outputfile, unsigned int ** outputList ){
                 fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                 fprintf(outputfile,"%05u,%05u,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
             }
+        }else{
+        LogMessage("Lista NULL\n");
         }
-    }
+    }else{
+        LogMessage("File NULL\n");
+    }   
 }
 
 void writeOutput( FILE* outputfile, unsigned int ** outputList ){
