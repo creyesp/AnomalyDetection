@@ -67,10 +67,28 @@ int comp96(const void *a, const void *b)
   return 0;
 }
 
+int comp64(const void *a, const void *b)
+{
+  size_t n;
+  unsigned int **a_ptr = (unsigned int **)a;
+  unsigned int **b_ptr = (unsigned int **)b;
+  // printf("%d %d\n",*((unsigned int*)*a_ptr),*((unsigned int*)*b_ptr));
+  for (n = 0; n != 4; ++n) {
+    if (b_ptr[0][n] > a_ptr[0][n]) {
+      return 1;
+    }
+    if (a_ptr[0][n] > b_ptr[0][n]) {
+      return -1;
+      
+    }
+  }
+  return 0;
+}
 
-void loginsert(long long *lists, unsigned int val, int length, int diff, int dsize) 
+void loginsert(long long *lists, unsigned int val, int diff, int dsize) 
 {
   // add on a value of diff to the counts for item val
+  int length = 32;
   int i;
   unsigned int bitmask;
 
@@ -86,9 +104,34 @@ void loginsert(long long *lists, unsigned int val, int length, int diff, int dsi
   lists[length+1] = dsize;
 }
 
-void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigned int val3, int length, int diff, int dsize) 
+void loginsert64(long long *lists, unsigned int val1, unsigned int val2, int diff, int dsize) 
 {
   // add on a value of diff to the counts for item val
+  int length = 64;
+  int i;
+  unsigned int bitmask, val;
+
+  lists[0]+=diff; // add onto the overall count for the group
+  bitmask = 1;
+  val = val2;
+
+  for(i=length; i > 0; i-=1)
+  {
+    if ((val&bitmask)!=0) // if the lsb = 1, then add on to that group
+      lists[i] += diff;
+    bitmask = bitmask<<1;
+    if(i == 33){
+      val = val1;
+      bitmask=1;
+    }
+  }
+  lists[length+1] += dsize; //tamaño del paquete
+}
+
+void loginsert96(long long *lists, unsigned int val1, unsigned int val2, unsigned int val3, int diff, int dsize) 
+{
+  // add on a value of diff to the counts for item val
+  int length = 96;
   int i;
   unsigned int bitmask, val;
 
@@ -168,11 +211,12 @@ CGT_type * CGT_Init(int buckets, int tests, int lgn)
 }
 
 //Funcion test, toma el umbral y hace las verificaciones
-unsigned int testCGT(long long *count, int nbit, long long thresh)
+unsigned int testCGT(long long *count, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
   //thresh is the threshold for detect anomalies
+  int nbit = 96;
   int t, tc;
   int c;
   unsigned int bit;
@@ -199,12 +243,60 @@ unsigned int testCGT(long long *count, int nbit, long long thresh)
   return output;
 }
 
-//unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
-int testCGT96(unsigned int rtest[3], long long *count, int nbit, long long thresh)
+
+int testCGT64(unsigned int rtest[2], long long *count, long long thresh)
 {
   //count is the subbucket with #elements
   //nbit is the long of subbucket
   //thresh is the threshold for detect anomalies
+  int nbit = 64;
+  int t, tc;
+  int c;
+  unsigned int bit;
+  unsigned int output = 0;
+  unsigned int result[2];
+
+  if( abs(count[0]) >= thresh )  //the first test
+  {
+    for( c = 1; c <= nbit; c++)
+    {
+      tc = abs(count[0]) - abs(count[c]); //test complemento
+      t = abs(count[c]); //test
+      if( t >= thresh && tc >= thresh ) // |T{a,b,c}| = |T'{a,b,c}|, the second test
+        //return NULL;
+        return 1;
+      if( t >= thresh ) // the third test
+        bit = 1;
+      if( tc >= thresh )
+        bit = 0;
+      output = (output<<1);
+      output += bit; 
+      if( c == 32){
+        result[0] = output;
+        output = 0;
+      }
+    }
+    result[1] = output;
+
+    rtest[0] = result[0];
+    rtest[1] = result[1];
+  }
+  else{
+    return 1;
+    rtest[0] = 0;
+    rtest[1] = 0;
+  }
+    //return NULL;
+  return 0;
+}
+
+//unsigned int *testCGT96(unsigned int *result, int *count, int nbit, int thresh)
+int testCGT96(unsigned int rtest[3], long long *count, long long thresh)
+{
+  //count is the subbucket with #elements
+  //nbit is the long of subbucket
+  //thresh is the threshold for detect anomalies
+  int nbit = 96
   int t, tc;
   int c;
   unsigned int bit;
@@ -264,10 +356,33 @@ void CGT_Update(CGT_type *cgt, unsigned int newitem, int diff, int dsize)
     {
       hash=hash31(cgt->testa[i],cgt->testb[i],newitem);
       hash=hash % (cgt->buckets); 
-      loginsert( cgt->counts[offset+hash], newitem, cgt->logn,diff, dsize );
+      loginsert( cgt->counts[offset+hash], newitem,diff, dsize );
       offset+=cgt->buckets;
     }
 }
+
+void CGT_Update64(CGT_type *cgt, unsigned int srcip, unsigned int dstip, 
+                  int diff, int dsize)
+{
+  // receive an update and process the groups accordingly
+
+  int i;
+  unsigned int hash, hash1,hash2;
+  int offset=0;
+
+  cgt->count+=diff; //count all item
+  for (i=0;i<cgt->tests;i++) 
+    {
+      hash1 = hash31(cgt->testa[i],cgt->testb[i],srcip);
+      hash2 = hash31(cgt->testa[i],cgt->testb[i],dstip);
+      hash = ((hash1)<<16) + ((hash2)>>16);
+      hash = hash % (cgt->buckets); 
+      loginsert64( cgt->counts[offset+hash], srcip, dstip,diff , dsize);
+      offset+=cgt->buckets;
+    }
+}
+
+
 void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip, 
               unsigned short int srcport, unsigned short int dstport, int diff, int dsize)
 {
@@ -287,7 +402,7 @@ void CGT_Update96(CGT_type *cgt, unsigned int srcip, unsigned int dstip,
       hash3 = hash31(cgt->testa[i],cgt->testb[i],ports);
       hash = ((hash1)<<22) + (((hash2)<<22)>>10) + (((hash3)<<22)>>22);;
       hash = hash % (cgt->buckets); 
-      loginsert96( cgt->counts[offset+hash], srcip, dstip, ports, cgt->logn,diff , dsize);
+      loginsert96( cgt->counts[offset+hash], srcip, dstip, ports,diff , dsize);
       offset+=cgt->buckets;
     }
 }
@@ -319,7 +434,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
     {
       for (j=0; j<cgt->buckets; j++)      
         {      
-          guess=testCGT(cgt->counts[testval],cgt->logn,thresh);
+          guess=testCGT(cgt->counts[testval],thresh);
           // go into the group, and see if there is a frequent item there
           // then check item does hash into that group... 
           if (guess>0) 
@@ -354,7 +469,7 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   // if the item passes all the tests, then output it
                   results[hits][0] = guess;
                   results[hits][1] = (unsigned int)cgt->counts[testval][0];
-                  results[hits][2] = (unsigned int)(cgt->counts[testval][32+1]/cgt->counts[testval][0]);
+                  results[hits][2] = (unsigned int)(cgt->counts[testval][32+1]);
                   // LogMessage("RESULT  : %3u.%3u.%3u.%3u # ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
                   // LogMessage("%10d | %10d\n", results[hits][1],results[hits][2]);
                   hits++;
@@ -420,6 +535,152 @@ unsigned int ** CGT_Output(CGT_type * cgt,VGT_type * vgt, long long thresh)
   return(compresults);
 }  
 
+
+unsigned int ** CGT_Output64(CGT_type * cgt,VGT_type * vgt, long long thresh)
+{
+  // Find the hot items by doing the group testing
+
+  int i=0,j=0,k=0, outputGuess;
+  unsigned int guess[2]={0,0};
+  unsigned int **results, **compresults;
+  unsigned int hits =0;
+  unsigned int last[2];  
+  int claimed=0;  
+  int testval=0;
+  int pass = 0;
+  unsigned int hash,hash1,hash2;
+  
+  //guess = (unsigned int*)calloc(3,sizeof(unsigned int));
+
+  results=(unsigned int**)calloc(cgt->tests*cgt->buckets,sizeof(unsigned int*));
+  if (results==NULL) exit(1); 
+  for(i = 0; i < cgt->tests*cgt->buckets; i++){
+    results[i] = (unsigned int*)calloc(4,sizeof(unsigned int));
+    if (results[i] == NULL) exit(1); 
+  }
+  // make some space for the list of results
+  
+  for (i=0;i<cgt->tests;i++)
+    {
+      for (j=0; j<cgt->buckets; j++)      
+        {      
+          //guess = testCGT96(cgt->counts[testval],cgt->logn,thresh);
+          outputGuess = testCGT64(guess, cgt->counts[testval],thresh);
+          // go into the group, and see if there is a frequent item there
+          // then check item does hash into that group... 
+          if (outputGuess == 0) 
+            {
+              hash1 = hash31(cgt->testa[i],cgt->testb[i],guess[0]);
+              hash2 = hash31(cgt->testa[i],cgt->testb[i],guess[1]);
+              hash = ((hash1)<<16) + ((hash2)>>16);
+              hash = hash % cgt->buckets; 
+            }
+          if ((outputGuess == 0) && (hash == j))
+            {
+              pass=1;
+              for (k=0;k<cgt->tests;k++) 
+                {
+                  // check every hash of that item is above threshold... 
+                  hash1 = hash31(cgt->testa[k],cgt->testb[k],guess[0]);
+                  hash2 = hash31(cgt->testa[k],cgt->testb[k],guess[1]);
+                  hash = ((hash1)<<16) + ((hash2)>>16);
+                  hash=(cgt->buckets*k) + (hash % (cgt->buckets));
+                  if (abs(cgt->counts[hash][0]) < thresh){
+                    pass=0;                  }
+                }
+              for( k = 0; k < vgt->tests; k++ ) 
+              {
+                hash1 = hash31(vgt->testa[k],vgt->testb[k],guess[0]);
+                hash2 = hash31(vgt->testa[k],vgt->testb[k],guess[1]);
+                hash = ((hash1)<<16) + ((hash2)>>16);
+                hash = (vgt->buckets*k) + (hash % (vgt->buckets));
+                if (abs(vgt->counts[hash]) < thresh)
+                {
+                  pass = 0;
+                }
+                
+              }
+              if (pass==1)
+                { 
+                  // if the item passes all the tests, then output i
+                  results[hits][0] = guess[0];
+                  results[hits][1] = guess[1];
+                  results[hits][2] = (unsigned int)cgt->counts[testval][0];
+                  results[hits][3] = (unsigned int)(cgt->counts[testval][64+1]);
+                  LogMessage("Salida de resuls  : %3u.%3u.%3u.%3u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
+                  LogMessage("%3u.%3u.%3u.%3u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
+                  LogMessage("%d - %d\n", results[hits][2], results[hits][3]);
+                  hits++;
+                }
+            }
+          testval++;
+        }
+    }
+  if (hits>0)
+    {
+      // sort the output
+
+      qsort(results, cgt->tests*cgt->buckets , sizeof *results, comp64);
+      for (i=0;i<hits;i++)
+        { 
+          if (results[i][0]!=last[0] || results[i][1]!=last[1])
+            {   // For each distinct item in the output...
+              claimed++;
+              last[0]=results[i][0];
+              last[1]=results[i][1];
+              LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
+              LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
+              LogMessage("%d - %d \n", results[i][2],results[i][3]);
+            }
+        }
+      compresults = calloc(claimed+1,sizeof(unsigned int *));
+      if (compresults==NULL) exit(1);
+      for(i = 0; i <= claimed; i++){
+        compresults[i] = calloc(4,sizeof(unsigned int));
+        if(compresults[i] == NULL) exit(1);
+      } 
+
+      claimed=1; last[0]=0; last[1]=0; //last[2]=1 es porque en el caso de IPSD los puertos son ceros
+
+      for (i=0;i<hits;i++)
+        { 
+          if (results[i][0]!=last[0] && results[i][1]!=last[1])
+            {   // For each distinct item in the output...
+              LogMessage("SORT  : %u.%u.%u.%u - ", results[i][0]&0x000000ff,(results[i][0]&0x0000ff00)>>8,(results[i][0]&0x00ff0000)>>16,(results[i][0]&0xff000000)>>24);
+              LogMessage("%u.%u.%u.%u - ", results[i][1]&0x000000ff,(results[i][1]&0x0000ff00)>>8,(results[i][1]&0x00ff0000)>>16,(results[i][1]&0xff000000)>>24);
+              LogMessage("%d - %d \n", results[i][2],results[i][3]);
+              compresults[claimed][0]=results[i][0];
+              compresults[claimed][1]=results[i][1];
+              compresults[claimed][2]=results[i][2];
+              compresults[claimed][3]=results[i][3];
+              last[0]=results[i][0];
+              last[1]=results[i][1];
+
+              LogMessage("Result  : %3u.%3u.%3u.%3u | ", compresults[claimed][0]&0x000000ff,(compresults[claimed][0]&0x0000ff00)>>8,(compresults[claimed][0]&0x00ff0000)>>16,(compresults[claimed][0]&0xff000000)>>24);
+              LogMessage("%3u.%3u.%3u.%3u | ", compresults[claimed][1]&0x000000ff,(compresults[claimed][1]&0x0000ff00)>>8,(compresults[claimed][1]&0x00ff0000)>>16,(compresults[claimed][1]&0xff000000)>>24);
+              LogMessage("%10d | %10d\n", compresults[claimed][2],compresults[claimed][3]);
+              claimed++;
+            }
+        }
+        compresults[0][0]=claimed;
+        LogMessage("Claimed %d\n",compresults[0][0]);  
+    } 
+  else
+    {
+      for(i = 0; i < cgt->tests*cgt->buckets; i++){
+        free(results[i]);
+      }
+      free(results);
+      return NULL;
+    }
+  for(i = 0; i < cgt->tests*cgt->buckets; i++){
+    free(results[i]);
+  }
+  free(results);
+  return(compresults);
+}  
+
+
 unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
 {
   // Find the hot items by doing the group testing
@@ -449,7 +710,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
       for (j=0; j<cgt->buckets; j++)      
         {      
           //guess = testCGT96(cgt->counts[testval],cgt->logn,thresh);
-          outputGuess = testCGT96(guess, cgt->counts[testval],cgt->logn,thresh);
+          outputGuess = testCGT96(guess, cgt->counts[testval],thresh);
           // go into the group, and see if there is a frequent item there
           // then check item does hash into that group... 
           if (outputGuess == 0) 
@@ -494,7 +755,7 @@ unsigned int ** CGT_Output96(CGT_type * cgt,VGT_type * vgt, long long thresh)
                   results[hits][1] = guess[1];
                   results[hits][2] = guess[2];
                   results[hits][3] = (unsigned int)cgt->counts[testval][0];
-                  results[hits][4] = (unsigned int)(cgt->counts[testval][cgt->logn+1]/cgt->counts[testval][0]);
+                  results[hits][4] = (unsigned int)(cgt->counts[testval][cgt->logn+1]);
                   // LogMessage("Salida de resuls  : %3u.%3u.%3u.%3u - ", results[hits][0]&0x000000ff,(results[hits][0]&0x0000ff00)>>8,(results[hits][0]&0x00ff0000)>>16,(results[hits][0]&0xff000000)>>24);
                   // LogMessage("%3u.%3u.%3u.%3u - ", results[hits][1]&0x000000ff,(results[hits][1]&0x0000ff00)>>8,(results[hits][1]&0x00ff0000)>>16,(results[hits][1]&0xff000000)>>24);
                   // LogMessage("%11d - %11d ", (results[hits][2]&0xffff0000)>>16,results[hits][2]&0x0000ffff);
