@@ -691,9 +691,9 @@ static void PreprocFunction(Packet *p,void *context)
             
             LogMessage("=================  IPdst Packets Dsize  =================  \n");
             
-            outputListIPSRC = CGT_Output96(cgtIPDST, vgtIPDST, ComputeThresh(cgtIPDST));
+            outputListIPSRC = CGT_Output(cgtIPDST, vgtIPDST, ComputeThresh(cgtIPDST));
             writeOutput(outputIPd,outputListIPSRC);            
-            outputDiffListIPSRC = CGT_Output96(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
+            outputDiffListIPSRC = CGT_Output(cgt_oldIPDST, vgt_oldIPDST, ComputeDiffThresh(cgt_oldIPDST));    
             writeOutput(outputIPd_diff,outputDiffListIPSRC);            
             
             CGT_Destroy(cgt_oldIPDST);
