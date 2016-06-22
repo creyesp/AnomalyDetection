@@ -296,7 +296,7 @@ int testCGT96(unsigned int rtest[3], long long *count, long long thresh)
   //count is the subbucket with #elements
   //nbit is the long of subbucket
   //thresh is the threshold for detect anomalies
-  int nbit = 96
+  int nbit = 96;
   int t, tc;
   int c;
   unsigned int bit;
@@ -906,7 +906,7 @@ void VGT_Update(VGT_type *vgt, unsigned int newitem, int diff)
     }
 }
 
-void VGT_Update96(VGT_type *vgt, unsigned int srcip, unsigned int dstip, int diff)
+void VGT_Update64(VGT_type *vgt, unsigned int srcip, unsigned int dstip, int diff)
 {
   // receive an update and process the groups accordingly
 

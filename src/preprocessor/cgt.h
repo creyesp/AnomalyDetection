@@ -25,7 +25,7 @@ extern void CGT_Update(CGT_type *, unsigned int, int,int);
 extern void CGT_Update64(CGT_type *, unsigned int,unsigned int, int,int); 
 extern void CGT_Update96(CGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int,int); 
 extern unsigned int ** CGT_Output(CGT_type *, VGT_type *, long long);
-extern unsigned int ** CGT_Output64(CGT_type *,VGT_type *, long long)
+extern unsigned int ** CGT_Output64(CGT_type *,VGT_type *, long long);
 extern unsigned int ** CGT_Output96(CGT_type *, VGT_type *, long long);
 extern int CGT_Size(CGT_type *);
 extern void CGT_Destroy(CGT_type *);
