@@ -906,6 +906,25 @@ void VGT_Update(VGT_type *vgt, unsigned int newitem, int diff)
     }
 }
 
+void VGT_Update96(VGT_type *vgt, unsigned int srcip, unsigned int dstip, int diff)
+{
+  // receive an update and process the groups accordingly
+
+  int i;
+  unsigned int hash,hash1,hash2;
+  int offset=0;
+
+  vgt->count+=diff; //count all item
+  for (i=0;i<vgt->tests;i++) 
+    {
+      hash1 = hash31(vgt->testa[i],vgt->testb[i],srcip);
+      hash2 = hash31(vgt->testa[i],vgt->testb[i],dstip);
+      hash = ((hash1)<<16) + ((hash2)>>16);
+      hash = hash % (vgt->buckets); 
+      vgt->counts[offset+hash] += diff;
+      offset += vgt->buckets;
+    }
+}
 
 void VGT_Update96(VGT_type *vgt, unsigned int srcip, unsigned int dstip, unsigned short int srcport, unsigned short int dstport, int diff)
 {

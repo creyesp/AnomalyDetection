@@ -194,8 +194,8 @@ static void AnomalyDetectionInit(struct _SnortConfig *sc, char *args)
     vgtIPDST = VGT_Init(ad_Config->groups,ad_Config->hashtest);
     vgt_oldIPDST = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
-    cgtIPSD = CGT_Init(ad_Config->groups,ad_Config->hashtest,96);
-    cgt_oldIPSD = CGT_Init(ad_Config->groups,ad_Config->hashtest,96);
+    cgtIPSD = CGT_Init(ad_Config->groups,ad_Config->hashtest,64);
+    cgt_oldIPSD = CGT_Init(ad_Config->groups,ad_Config->hashtest,64);
     vgtIPSD = VGT_Init(ad_Config->groups,ad_Config->hashtest);
     vgt_oldIPSD = VGT_Init(ad_Config->groups,ad_Config->hashtest);
 
@@ -386,10 +386,10 @@ static void addCGT(Packet *p)
             VGT_Update(vgtIPDST, ipdst, packetsize); 
             VGT_Update(vgt_oldIPDST, ipdst, -1*packetsize);  
 
-            CGT_Update96(cgtIPSD, ipsrc,ipdst, 0, 0, packetsize,(int)p->dsize);
-            CGT_Update96(cgt_oldIPSD, ipsrc,ipdst, 0, 0, -1*packetsize,-1*(int)p->dsize); 
-            VGT_Update96(vgtIPSD, ipsrc,ipdst, 0, 0, packetsize); 
-            VGT_Update96(vgt_oldIPSD, ipsrc,ipdst, 0, 0, -1*packetsize);
+            CGT_Update64(cgtIPSD, ipsrc,ipdst, packetsize,(int)p->dsize);
+            CGT_Update64(cgt_oldIPSD, ipsrc,ipdst, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update64(vgtIPSD, ipsrc,ipdst, packetsize); 
+            VGT_Update64(vgt_oldIPSD, ipsrc,ipdst, -1*packetsize);
         }
     }
        
@@ -417,7 +417,7 @@ static void addCGT(Packet *p)
             // p->outer_iph                    //*IPHdr
             // p->tcph                         //*TCPHdr
             // p->orig_tcph                    //*TCPHdr
-            // p-dsize                           //uint16_t
+            // p-dsize                           //uint16_t bytes
             // p->sp                              //uint16_t
             // p->dp                         //uint16_t
             // p->orig_sp                       //uint16_t
@@ -520,6 +520,36 @@ void writeOutput96( FILE* outputfile, unsigned int ** outputList ){
                 fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                 fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                 fprintf(outputfile,"%05u,%05u,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+            }
+        }else{
+        LogMessage("Lista NULL\n");
+        }
+    }else{
+        LogMessage("File NULL\n");
+    }   
+}
+
+void writeOutput64( FILE* outputfile, unsigned int ** outputList ){
+    struct tm* tmlocal;
+    char strdate[200];
+    int i;
+
+    
+    if ( outputfile != NULL)
+    {
+        if(outputList != NULL){
+            LogMessage("Numero de salidas: %d\n",outputList[0][0]);
+            for(i=1; i < outputList[0][0]; i++)
+            {
+                LogMessage("ipsrc %3u.%3u.%3u.%3u" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                LogMessage(" ipdst %3u.%3u.%3u.%3u" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                LogMessage(" packet %d size %d\n",outputList[i][2], outputList[i][3]);
+                tmlocal = localtime(&LastLogTime);
+                strftime(strdate, 200, "\"%x %X\"", tmlocal);
+                fprintf(outputfile,"%s," ,strdate);
+                fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
+                fprintf(outputfile,"\"%03u.%03u.%03u.%03u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
+                fprintf(outputfile,"%d,%d\n",outputList[i][2], outputList[i][3]);
             }
         }else{
         LogMessage("Lista NULL\n");
@@ -659,16 +689,16 @@ static void PreprocFunction(Packet *p,void *context)
 
             LogMessage("=================  IPsrc IPdst - - Packets Dsize  =================  \n");
             
-            outputListIPSD = CGT_Output96(cgtIPSD, vgtIPSD, ComputeThresh(cgtIPSD));
-            writeOutput96(outputIPsd,outputListIPSD);
-            outputDiffListIPSD = CGT_Output96(cgt_oldIPSD, vgt_oldIPSD, ComputeDiffThresh(cgt_oldIPSD));    
-            writeOutput96(outputIPsd_diff,outputDiffListIPSD);
+            outputListIPSD = CGT_Output64(cgtIPSD, vgtIPSD, ComputeThresh(cgtIPSD));
+            writeOutput64(outputIPsd,outputListIPSD);
+            outputDiffListIPSD = CGT_Output64(cgt_oldIPSD, vgt_oldIPSD, ComputeDiffThresh(cgt_oldIPSD));    
+            writeOutput64(outputIPsd_diff,outputDiffListIPSD);
             
             CGT_Destroy(cgt_oldIPSD);
             VGT_Destroy(vgt_oldIPSD);
             cgt_oldIPSD = cgtIPSD;
             vgt_oldIPSD = vgtIPSD;
-            cgtIPSD = CGT_Init(pc->groups,pc->hashtest,pc->lgn);
+            cgtIPSD = CGT_Init(pc->groups,pc->hashtest,64);
             vgtIPSD = VGT_Init(pc->groups,pc->hashtest);
             if(outputListIPSD != NULL) preprocFreeOutputList(outputListIPSD);
             if(outputDiffListIPSD != NULL) preprocFreeOutputList(outputDiffListIPSD);
