@@ -376,6 +376,11 @@ static void addCGT(Packet *p)
             VGT_Update96(vgt124, ipsrc,ipdst, 0, dstport, packetsize); 
             VGT_Update96(vgt124_old, ipsrc,ipdst, 0, dstport, -1*packetsize);   
 
+            CGT_Update64(cgtIPSD, ipsrc,ipdst, packetsize,(int)p->dsize);
+            CGT_Update64(cgt_oldIPSD, ipsrc,ipdst, -1*packetsize,-1*(int)p->dsize); 
+            VGT_Update64(vgtIPSD, ipsrc,ipdst, packetsize); 
+            VGT_Update64(vgt_oldIPSD, ipsrc,ipdst, -1*packetsize);
+
             CGT_Update(cgtIPSRC, ipsrc, packetsize,(int)p->dsize);
             CGT_Update(cgt_oldIPSRC, ipsrc, -1*packetsize,-1*(int)p->dsize); 
             VGT_Update(vgtIPSRC, ipsrc, packetsize); 
@@ -386,10 +391,6 @@ static void addCGT(Packet *p)
             VGT_Update(vgtIPDST, ipdst, packetsize); 
             VGT_Update(vgt_oldIPDST, ipdst, -1*packetsize);  
 
-            CGT_Update64(cgtIPSD, ipsrc,ipdst, packetsize,(int)p->dsize);
-            CGT_Update64(cgt_oldIPSD, ipsrc,ipdst, -1*packetsize,-1*(int)p->dsize); 
-            VGT_Update64(vgtIPSD, ipsrc,ipdst, packetsize); 
-            VGT_Update64(vgt_oldIPSD, ipsrc,ipdst, -1*packetsize);
         }
     }
        

@@ -216,7 +216,7 @@ unsigned int testCGT(long long *count, long long thresh)
   //count is the subbucket with #elements
   //nbit is the long of subbucket
   //thresh is the threshold for detect anomalies
-  int nbit = 96;
+  int nbit = 32;
   int t, tc;
   int c;
   unsigned int bit;
