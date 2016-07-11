@@ -254,6 +254,7 @@ prng_type * prng_Init(long seed, int nric) {
   prng_type * result;
 
   result=(prng_type *) calloc(1,sizeof(prng_type));
+  if(result == NULL) exit(1);
 
   result->iy=0;
   result->usenric=nric; 

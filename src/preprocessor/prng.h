@@ -37,7 +37,7 @@ typedef struct prng_type{
 extern long prng_int(prng_type *);
 extern float prng_float(prng_type *);
 extern prng_type * prng_Init(long, int);
-extern void prng_Destroy(prng_type * prng);
+extern void prng_Destroy(prng_type *);
 void prng_Reseed(prng_type *, long);
 
 //extern long double zipf(double, long) ;

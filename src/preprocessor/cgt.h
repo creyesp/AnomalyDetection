@@ -7,32 +7,32 @@ typedef struct CGT_type{
   int logn;
   int buckets;
   int subbuckets;
-  long long count;
-  long long ** counts;
+  int count;
+  int ** counts;
   long long *testa, *testb;
 } CGT_type;
 
 typedef struct VGT_type{
   int tests;
   int buckets;
-  long long count;
-  long long * counts;
+  int count;
+  int * counts;
   long long  *testa, *testb;
 } VGT_type;
 
-extern CGT_type * CGT_Init(int, int, int);
-extern void CGT_Update(CGT_type *, unsigned int, int,int); 
-extern void CGT_Update64(CGT_type *, unsigned int,unsigned int, int,int); 
-extern void CGT_Update96(CGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int,int); 
-extern unsigned int ** CGT_Output(CGT_type *, VGT_type *, long long);
-extern unsigned int ** CGT_Output64(CGT_type *,VGT_type *, long long);
-extern unsigned int ** CGT_Output96(CGT_type *, VGT_type *, long long);
-extern int CGT_Size(CGT_type *);
+// extern CGT_type * CGT_Init(int, int, int);
+extern void CGT_Init(CGT_type **, int, int, int);
+extern void CGT_Update( CGT_type *, unsigned int, int,int); 
+extern void CGT_Update64( CGT_type *, unsigned int,unsigned int, int,int); 
+extern void CGT_Update96( CGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int,int); 
+extern int CGT_Output( unsigned int ***, CGT_type *, VGT_type *, int);
+extern int CGT_Output64( unsigned int ***, CGT_type *, VGT_type *, int);
+extern int CGT_Output96( unsigned int ***, CGT_type *, VGT_type *, int);
 extern void CGT_Destroy(CGT_type *);
 
-extern VGT_type * VGT_Init(int, int);
-extern void VGT_Update(VGT_type *, unsigned int, int);
-extern void VGT_Update64(VGT_type *, unsigned int,unsigned int, int);
-extern void VGT_Update96(VGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int);
+extern void VGT_Init(VGT_type **,int, int);
+extern void VGT_Update( VGT_type *, unsigned int, int);
+extern void VGT_Update64( VGT_type *, unsigned int,unsigned int, int);
+extern void VGT_Update96( VGT_type *, unsigned int,unsigned int,unsigned short int,unsigned short int, int);
 extern void VGT_Destroy(VGT_type *);
 
