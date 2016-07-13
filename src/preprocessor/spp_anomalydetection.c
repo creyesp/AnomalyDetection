@@ -309,6 +309,11 @@ static void ParseAnomalyDetectionArgs(AnomalydetectionConfig* pc, char *args)
             pc->datah = 1;
         }
 
+        if ( !strcasecmp("alertThresh", arg) ) 
+        {
+            pc->alertThresh = atoi(arg);
+        }
+
            
        arg = strtok(NULL, CONF_SEPARATORS);
     }
@@ -467,7 +472,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
     
     struct tm* tmlocal;
-    char strdate[200];
+    char strdate[200], msg[200];
     int i;
     
     if(pc->verbose) LogMessage("=================   %s  =================  \n",tsName);
@@ -483,11 +488,21 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                     if(pc->verbose)
                     {
                         LogMessage("| IP %u.%u.%u.%u\t", outputList[i][0]&0x000000ff,(outputList[i][0]&0x0000ff00)>>8,(outputList[i][0]&0x00ff0000)>>16,(outputList[i][0]&0xff000000)>>24);
-                        LogMessage("| packets: %d \t| size: %d |\n", outputList[i][1],outputList[i][2]);                        
+                        LogMessage("| packets: %10d \t| size: %10d |\n", outputList[i][1],outputList[i][2]);                        
                     }
                     fprintf(outputfile,"%s," ,strdate);
                     fprintf(outputfile,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     fprintf(outputfile,"%d,%d,%d\n",outputList[i][1], abs(outputList[i][1]), outputList[i][2]);
+                    if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
+                    {
+                        LogMessage("ALERT IPsrc IPdst!\n");
+                        //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
+                        if(outputList[i][3] > pc->alertThresh )
+                        {
+                            sprintf(msg,"ANOMALY DETECTION %s: %u.%u.%u.%u PACKETS: %d BYTES: %d",tsName,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, outputList[i][1], outputList[i][2])
+                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IP_PACKETS,1,999,1,msg);
+                        }
+                    }
                 }
             }else if(outputList[0][1] == 4){
                 for(i=1; i < outputList[0][0]; i++)
@@ -496,12 +511,22 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                     {   
                         LogMessage("| IPs %u.%u.%u.%u\t" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         LogMessage("| IPd %u.%u.%u.%u \t" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        LogMessage("| packet: %d \t| size: %d |\n",outputList[i][2], outputList[i][3]);
+                        LogMessage("| packet: %10d | size: %10d |\n",outputList[i][2], outputList[i][3]);
                     }
                     fprintf(outputfile,"%s," ,strdate);
                     fprintf(outputfile,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     fprintf(outputfile,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                     fprintf(outputfile,"%d,%d,%d\n",outputList[i][2],abs(outputList[i][2]), outputList[i][3]);
+                    if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
+                    {
+                        LogMessage("ALERT IPsrc IPdst!\n");
+                        //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
+                        if(outputList[i][3] > pc->alertThresh )
+                        {
+                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, outputList[i][2], outputList[i][3])
+                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PACKETS,1,999,1,msg);
+                        }
+                    }
                 }
             }else if (outputList[0][1] == 5)
             {
@@ -511,12 +536,22 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                     {   
                         LogMessage("| IPs %u.%u.%u.%u\t" ,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                         LogMessage("| IPd %u.%u.%u.%u\t" ,(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
-                        LogMessage("| PORTs: %u \tPORTd: %u \t| packet: %d \t| size: %d |\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
+                        LogMessage("| PORTs: %5u PORTd: %5u | packet: %10d | size: %10d |\n", (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                     }
                     fprintf(outputfile,"%s," ,strdate);
                     fprintf(outputfile,"\"%u.%u.%u.%u\",",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24);
                     fprintf(outputfile,"\"%u.%u.%u.%u\",",(outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24);
                     fprintf(outputfile,"%u,%u,%d,%d,%d\n",(outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3],abs(outputList[i][3]), outputList[i][4]);
+                    if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
+                    {
+                        LogMessage("ALERT IPsrc IPdst PORTsrc PORTdst!\n");
+                        //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
+                        if(outputList[i][3] > pc->alertThresh )
+                        {
+                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PORTsrc: %u PORTdst: %u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4])
+                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PORTSD_PACKETS,1,999,1,msg);
+                        }
+                    }
                 }                
             }
         }else
@@ -553,11 +588,10 @@ static void PreprocFunction(Packet *p,void *context)
             if(pc->verbose)
             {
                 LogMessage("\n************************************************************************\n");
-                LogMessage("AnomalyDetection log time:  %s\n",ctime(&LastLogTime));
+                LogMessage("AnomalyDetection log time:  %s",ctime(&LastLogTime));
                 LogMessage("Paquetes capturados por SNORT: %d\n",countpaket);
-                LogMessage("=================  IPsrc/dst PORTsrc/dst Packets Dsize  =================  \n");                
+                LogMessage("\n************************************************************************\n");
             }
-
             
             CGT_Output96(&diffList_IPsdPORTsd, cgtIPSD_PSD, vgtIPSD_PSD, ComputeDiffThresh(cgtIPSD_PSD));
             writeOutput(outputIPsdPORTsd_diff,diffList_IPsdPORTsd, "IPsrc/dst PORTsrc/dst");
@@ -570,8 +604,6 @@ static void PreprocFunction(Packet *p,void *context)
             VGT_Init(&vgtIPSD_PSD_old, pc->groups,pc->hashtest);            
 
             if(diffList_IPsdPORTsd != NULL) preprocFreeOutputList(diffList_IPsdPORTsd);
-
-            // LogMessage("=================   IPsrc/dst - PORTsrc Packets Dsize  =================  \n");
             
             CGT_Output96(&diffList_IPsdPORTs, cgtIPSD_PS, vgtIPSD_PS, ComputeDiffThresh(cgtIPSD_PS)) ;
             writeOutput(outputIPsdPORTs_diff,diffList_IPsdPORTs,"Psrc/dst - PORTsrc");
@@ -584,8 +616,6 @@ static void PreprocFunction(Packet *p,void *context)
             VGT_Init(&vgtIPSD_PS_old, pc->groups,pc->hashtest);
 
             if(diffList_IPsdPORTs != NULL) preprocFreeOutputList(diffList_IPsdPORTs);
-
-            // LogMessage("=================  IPsrc/dst - PORTdst Packets Dsize  =================  \n");
             
             CGT_Output96(&diffList_IPsdPORTd, cgtIPSD_PD, vgtIPSD_PD, ComputeDiffThresh(cgtIPSD_PD));    
             writeOutput(outputIPsdPORTd_diff,diffList_IPsdPORTd, "IPsrc/dst - PORTdst");
@@ -598,8 +628,6 @@ static void PreprocFunction(Packet *p,void *context)
             VGT_Init(&vgtIPSD_PD_old, pc->groups,pc->hashtest);
            
             if(diffList_IPsdPORTd != NULL) preprocFreeOutputList(diffList_IPsdPORTd);     
-
-            // LogMessage("=================  IPsrc/dst Packets Dsize  =================  \n");
             
             CGT_Output64(&diffList_IPsd, cgtIPSD, vgtIPSD, ComputeDiffThresh(cgtIPSD));
             writeOutput(outputIPsd_diff,diffList_IPsd, "IPsrc/dst");
@@ -612,8 +640,6 @@ static void PreprocFunction(Packet *p,void *context)
             VGT_Init(&vgt_oldIPSD, pc->groups,pc->hashtest);
 
             if(diffList_IPsd != NULL) preprocFreeOutputList(diffList_IPsd);
-
-            // LogMessage("=================  IPsrc Packets Dsize  =================  \n");
             
             CGT_Output(&diffList_IPs, cgtIPS, vgtIPS, ComputeDiffThresh(cgtIPS));
             writeOutput(outputIPs_diff,diffList_IPs, "IPsrc");            
@@ -626,9 +652,7 @@ static void PreprocFunction(Packet *p,void *context)
             VGT_Init(&vgt_oldIPS, pc->groups,pc->hashtest);
     
             if(diffList_IPs != NULL) preprocFreeOutputList(diffList_IPs);        
-            
-            // LogMessage("=================  IPdst Packets Dsize  =================  \n");
-            
+                        
             CGT_Output(&diffList_IPd, cgtIPD, vgtIPD, ComputeDiffThresh(cgtIPD));
             writeOutput(outputIPd_diff,diffList_IPd, "IPdst");            
             
@@ -642,11 +666,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPd != NULL) preprocFreeOutputList(diffList_IPd); 
         }
      
-        if (pc->alert)  //if flag "alert" is set in config file, preprocessor will generate alerts
-        {
-                LogMessage("CHECK\n");
-                //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
-        }
+
         // PREPROC_PROFILE_START(ad_perf_stats);
         addGT(p); //agrega el nuevo paquete a la estructura
         // PREPROC_PROFILE_END(ad_perf_stats);

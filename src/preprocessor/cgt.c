@@ -909,7 +909,7 @@ void VGT_Update( VGT_type *vgt, unsigned int newitem, int diff)
   vgt->count += diff; //count all item
   for (i = 0; i < vgt->tests; i++) 
   {
-    hash = VGTallocation(vgt, guess, i, 32) 
+    hash = VGTallocation(vgt, guess, i, 32);
     vgt->counts[i*vgt->buckets + hash] += diff; 
   }
 }
@@ -918,12 +918,12 @@ void VGT_Update64( VGT_type *vgt, unsigned int srcip, unsigned int dstip, int di
 {
   int i;
   unsigned int hash;
-  unsigned int guess[2] = {srcip, dstip}
+  unsigned int guess[2] = {srcip, dstip};
   
   vgt->count += diff; //count all item
   for (i = 0; i < vgt->tests; i++) 
   {
-    hash = VGTallocation(vgt, guess, i, 64) 
+    hash = VGTallocation(vgt, guess, i, 64);
     vgt->counts[i*vgt->buckets + hash] += diff;
   }
 }
@@ -943,7 +943,7 @@ void VGT_Update96( VGT_type *vgt, unsigned int srcip, unsigned int dstip, unsign
 
   for (i=0;i<vgt->tests;i++) 
   {
-    hash = VGTallocation(vgt, guess, i, 96) 
+    hash = VGTallocation(vgt, guess, i, 96);
     vgt->counts[i*vgt->buckets + hash] += diff;
   }
 }

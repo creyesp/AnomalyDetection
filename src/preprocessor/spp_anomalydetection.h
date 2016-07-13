@@ -14,6 +14,7 @@ typedef struct _AnomalydetectionConfig
     float delta; //probabilidad de falla
     int groups;   //numero de grupso totales 
     int hashtest; //numero de test hash que se realizan. 
+    int alertThresh;
 
 } AnomalydetectionConfig;
 
