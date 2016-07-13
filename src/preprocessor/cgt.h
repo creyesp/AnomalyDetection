@@ -9,7 +9,7 @@ typedef struct CGT_type{
   int subbuckets;
   int count;
   int ** counts;
-  long long *testa, *testb;
+  long  *testa, *testb;
 } CGT_type;
 
 typedef struct VGT_type{
@@ -17,7 +17,7 @@ typedef struct VGT_type{
   int buckets;
   int count;
   int * counts;
-  long long  *testa, *testb;
+  long   *testa, *testb;
 } VGT_type;
 
 // extern CGT_type * CGT_Init(int, int, int);

@@ -7,6 +7,8 @@ typedef struct _AnomalydetectionConfig
     int nlog;
     int alert;
     int GatherTime;
+    int verbose; 
+    int datah; //si esta habilitado la opcion de guardar todas las cabeceras de los paquetes
     float phi;  //porcentaje de las diferencias totales en la ventana de tiempo
     float epsilon; //actor de aproximacion 
     float delta; //probabilidad de falla
