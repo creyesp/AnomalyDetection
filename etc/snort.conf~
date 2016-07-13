@@ -507,7 +507,8 @@ preprocessor reputation: \
 
 #20150627 creyesp 
 # Anomaly Detection preprocesor.
-preprocessor AnomalyDetection: LogPath /var/log/snort alert log time 3 phi 0.01 epsilon 0.0008 delta 0.063 verbose alertThresh 800
+#preprocessor AnomalyDetection: ProfilePath /etc/profile.txt LogPath /var/log/snort alert log time 60 
+preprocessor AnomalyDetection: LogPath /var/log/snort log time 3 phi 0.001 epsilon 0.0008 delta 0.063 lgn 32 
 
 ###################################################
 # Step #6: Configure output plugins
