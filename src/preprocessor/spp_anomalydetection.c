@@ -499,7 +499,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
                         if(outputList[i][3] > pc->alertThresh )
                         {
-                            sprintf(msg,"ANOMALY DETECTION %s: %u.%u.%u.%u PACKETS: %d BYTES: %d",tsName,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, outputList[i][1], outputList[i][2])
+                            sprintf(msg,"ANOMALY DETECTION %s: %u.%u.%u.%u PACKETS: %d BYTES: %d",tsName,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, outputList[i][1], outputList[i][2]);
                             GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IP_PACKETS,1,999,1,msg);
                         }
                     }
@@ -523,7 +523,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
                         if(outputList[i][3] > pc->alertThresh )
                         {
-                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, outputList[i][2], outputList[i][3])
+                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, outputList[i][2], outputList[i][3]);
                             GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PACKETS,1,999,1,msg);
                         }
                     }
@@ -548,7 +548,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         //if (profile.MAX.DataDnsDownKB<DataDnsDownKB/TimeInterval) GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED,1,999,1,"AD_HIGH_VALUE_OF_DOWNLOAD_DNS_DATA_SPEED");
                         if(outputList[i][3] > pc->alertThresh )
                         {
-                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PORTsrc: %u PORTdst: %u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4])
+                            sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PORTsrc: %u PORTdst: %u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
                             GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PORTSD_PACKETS,1,999,1,msg);
                         }
                     }
