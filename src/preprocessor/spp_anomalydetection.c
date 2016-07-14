@@ -467,7 +467,7 @@ static int ComputeDiffThresh(const CGT_type *cgt)
  * Returns: 
  */
 
-void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
+void writeOutput( Packet *p, FILE* outputfile, unsigned int ** outputList , char tsName[])
 {
     tSfPolicyId pid = sfPolicyUserPolicyGet(ad_context);//getNapRuntimePolicy();
     AnomalydetectionConfig* pc = (AnomalydetectionConfig*)sfPolicyUserDataGet(ad_context, pid);
@@ -501,7 +501,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         {
                             LogMessage("##################  ALERT %s! #################\n",tsName);
                             sprintf(msg,"ANOMALY DETECTION %s: %u.%u.%u.%u PACKETS: %d BYTES: %d",tsName,(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, outputList[i][1], outputList[i][2]);
-                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IP_PACKETS,1,999,1,msg);
+                            GenerateSnortEvent(p, GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IP_PACKETS,1,999,1,msg);
                         }
                     }
                 }
@@ -525,7 +525,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         {
                             LogMessage("##################  ALERT %d!  ############################## \n", tsName);
                             sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, outputList[i][2], outputList[i][3]);
-                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PACKETS,1,999,1,msg);
+                            GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PACKETS,1,999,1,msg);
                         }
                     }
                 }
@@ -550,7 +550,7 @@ void writeOutput( FILE* outputfile, unsigned int ** outputList , char tsName[])
                         {
                             LogMessage("##################  ALERT %s! #################\n",tsName);
                             sprintf(msg,"ANOMALY DETECTION IPsrc: %u.%u.%u.%u IPdst: %u.%u.%u.%u PORTsrc: %u PORTdst: %u PACKETS: %d BYTES: %d",(outputList[i][0] & 0x000000ff),(outputList[i][0] & 0x0000ff00) >> 8,(outputList[i][0] & 0x00ff0000) >> 16,(outputList[i][0] & 0xff000000) >> 24, (outputList[i][1] & 0x000000ff),(outputList[i][1] & 0x0000ff00) >> 8,(outputList[i][1] & 0x00ff0000) >> 16,(outputList[i][1] & 0xff000000) >> 24, (outputList[i][2]>>16), ((outputList[i][2]<<16)>>16),outputList[i][3], outputList[i][4]);
-                            GenerateSnortEventOtn(GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PORTSD_PACKETS,1,999,1,msg);
+                            GenerateSnortEvent(p,GENERATOR_SPP_AD,AD_HIGH_VALUE_OF_IPSD_PORTSD_PACKETS,1,999,1,msg);
                         }
                     }
                 }                
@@ -595,7 +595,7 @@ static void PreprocFunction(Packet *p,void *context)
             }
             
             CGT_Output96(&diffList_IPsdPORTsd, cgtIPSD_PSD, vgtIPSD_PSD, ComputeDiffThresh(cgtIPSD_PSD));
-            writeOutput(outputIPsdPORTsd_diff,diffList_IPsdPORTsd, "IPsrc/dst PORTsrc/dst");
+            writeOutput(p, outputIPsdPORTsd_diff,diffList_IPsdPORTsd, "IPsrc/dst PORTsrc/dst");
 
             CGT_Destroy(cgtIPSD_PSD);
             VGT_Destroy(vgtIPSD_PSD);
@@ -607,7 +607,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPsdPORTsd != NULL) preprocFreeOutputList(diffList_IPsdPORTsd);
             
             CGT_Output96(&diffList_IPsdPORTs, cgtIPSD_PS, vgtIPSD_PS, ComputeDiffThresh(cgtIPSD_PS)) ;
-            writeOutput(outputIPsdPORTs_diff,diffList_IPsdPORTs,"Psrc/dst - PORTsrc");
+            writeOutput(p, outputIPsdPORTs_diff,diffList_IPsdPORTs,"Psrc/dst - PORTsrc");
             
             CGT_Destroy(cgtIPSD_PS);
             VGT_Destroy(vgtIPSD_PS);
@@ -619,7 +619,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPsdPORTs != NULL) preprocFreeOutputList(diffList_IPsdPORTs);
             
             CGT_Output96(&diffList_IPsdPORTd, cgtIPSD_PD, vgtIPSD_PD, ComputeDiffThresh(cgtIPSD_PD));    
-            writeOutput(outputIPsdPORTd_diff,diffList_IPsdPORTd, "IPsrc/dst - PORTdst");
+            writeOutput(p, outputIPsdPORTd_diff,diffList_IPsdPORTd, "IPsrc/dst - PORTdst");
             
             CGT_Destroy(cgtIPSD_PD);
             VGT_Destroy(vgtIPSD_PD);
@@ -631,7 +631,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPsdPORTd != NULL) preprocFreeOutputList(diffList_IPsdPORTd);     
             
             CGT_Output64(&diffList_IPsd, cgtIPSD, vgtIPSD, ComputeDiffThresh(cgtIPSD));
-            writeOutput(outputIPsd_diff,diffList_IPsd, "IPsrc/dst");
+            writeOutput(p, outputIPsd_diff,diffList_IPsd, "IPsrc/dst");
             
             CGT_Destroy(cgtIPSD);
             VGT_Destroy(vgtIPSD);
@@ -643,7 +643,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPsd != NULL) preprocFreeOutputList(diffList_IPsd);
             
             CGT_Output(&diffList_IPs, cgtIPS, vgtIPS, ComputeDiffThresh(cgtIPS));
-            writeOutput(outputIPs_diff,diffList_IPs, "IPsrc");            
+            writeOutput(p, outputIPs_diff,diffList_IPs, "IPsrc");            
             
             CGT_Destroy(cgtIPS);
             VGT_Destroy(vgtIPS);
@@ -655,7 +655,7 @@ static void PreprocFunction(Packet *p,void *context)
             if(diffList_IPs != NULL) preprocFreeOutputList(diffList_IPs);        
                         
             CGT_Output(&diffList_IPd, cgtIPD, vgtIPD, ComputeDiffThresh(cgtIPD));
-            writeOutput(outputIPd_diff,diffList_IPd, "IPdst");            
+            writeOutput(p, outputIPd_diff,diffList_IPd, "IPdst");            
             
             CGT_Destroy(cgtIPD);
             VGT_Destroy(vgtIPD);
